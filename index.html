@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explore Lil Dino's Kitchen</title>
+<style>
+:root{--cream:#fff8e8;--green:#315c36;--pink:#f28ba8;--brown:#8a5a3b}
+*{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--green);font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center}
+.wrap{max-width:1200px;margin:auto;padding:18px 12px 34px}.title{font-weight:800;font-size:clamp(25px,4vw,44px);color:var(--pink);margin:4px 0 2px}.sub{margin:0 0 16px;font-size:clamp(15px,2vw,20px);color:var(--green)}
+.map{position:relative;width:100%;overflow:hidden;border-radius:22px;box-shadow:0 8px 28px rgba(70,45,20,.18);background:#fff}.map img{display:block;width:100%;height:auto}
+.hotspot{position:absolute;background:transparent;border:0;padding:0;cursor:pointer;z-index:2}
+.hotspot:focus-visible{outline:3px solid #fff;border-radius:18px;box-shadow:0 0 0 5px var(--pink)}
+.panel{display:none;margin:18px auto 0;max-width:900px;background:#fff0f4;border:3px solid #f7b0c3;border-radius:20px;padding:18px;text-align:left;box-shadow:0 5px 18px rgba(70,45,20,.1)}
+.panel.show{display:block}.panel h2{margin:0 0 8px;color:#a94c6a;font-size:clamp(22px,3vw,30px)}.panel p{margin:0 0 10px;line-height:1.5}.panel ul{margin:8px 0 0 20px;padding:0;line-height:1.55}.close{float:right;border:0;background:var(--pink);color:white;font-weight:800;border-radius:999px;padding:7px 12px;cursor:pointer}
+.note{margin-top:12px;font-size:13px;opacity:.75}
+/* Invisible tap areas line up with the destination signs in the artwork. */
+.pantry{left:13%;top:22%;width:20%;height:12%}.fridge{left:1%;top:45%;width:18%;height:13%}.herb{left:36%;top:23%;width:19%;height:13%}.dinner{left:53%;top:25%;width:23%;height:13%}.baking{right:10%;top:25%;width:20%;height:13%}.cafe{right:0%;top:43%;width:18%;height:16%}.prep{left:39%;top:53%;width:21%;height:15%}.secret{right:1%;top:62%;width:20%;height:15%}.trash{right:0%;bottom:1%;width:21%;height:15%}.hq{left:4%;bottom:1%;width:25%;height:25%}
+@media (max-width:600px){.wrap{padding:10px 7px 24px}.map{border-radius:14px}.panel{padding:14px;border-radius:15px}.note{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">🗺️ Explore Lil Dino's Kitchen</h1>
+  <p class="sub">Where should we explore today?<br>Pick a destination and start your adventure! ✨</p>
+  <div class="map" aria-label="Interactive map of Lil Dino's kitchen">
+    <img src="kitchen-map.png" alt="Little Dino's Kitchen Adventures map with Lil Dino on a pink step stool and his hamster-dragon pet beside him">
+    <button class="hotspot pantry" aria-label="Open Pantry" data-room="pantry"></button>
+    <button class="hotspot fridge" aria-label="Open Fridge" data-room="fridge"></button>
+    <button class="hotspot herb" aria-label="Open Herb Garden" data-room="herb"></button>
+    <button class="hotspot dinner" aria-label="Open Dinner Station" data-room="dinner"></button>
+    <button class="hotspot baking" aria-label="Open Baking Corner" data-room="baking"></button>
+    <button class="hotspot cafe" aria-label="Open Cozy Cafe" data-room="cafe"></button>
+    <button class="hotspot prep" aria-label="Open Prep Counter" data-room="prep"></button>
+    <button class="hotspot secret" aria-label="Open Secret Recipe Room" data-room="secret"></button>
+    <button class="hotspot trash" aria-label="Open Kitchen Trash" data-room="trash"></button>
+    <button class="hotspot hq" aria-label="Open Lil Dino's Kitchen HQ" data-room="hq"></button>
+  </div>
+  <section class="panel" id="panel" aria-live="polite">
+    <button class="close" id="close">Close</button>
+    <h2 id="roomTitle"></h2><p id="roomDesc"></p><ul id="roomList"></ul>
+  </section>
+  <div class="note">Tap a sign in the kitchen to explore. 🦖💗</div>
+</div>
+<script>
+const rooms={
+ pantry:{title:'🍓 The Pantry — Pantry Master',desc:'Welcome to the Pantry! Learn how to organize, store, and use everyday kitchen staples.',items:['🫙 Store It — simple storage tips','🧺 Organize It — make pantry items easy to find','🌾 Learn About It — pantry staple basics','⏰ Use It First — ideas for items that should be used soon']},
+ fridge:{title:'🥛 The Fridge — Food Freshness Guide',desc:'Keep your food fresh and your kitchen adventures safe.',items:['🥬 Produce — simple freshness and storage tips','🥩 Meat & Dairy — safer storage reminders','🥚 Eggs — where and how to store them','❄️ Freeze It — when freezing can help','👀 Use Me First! — foods to check first']},
+ herb:{title:'🌿 The Herb Garden — Herb & Seasoning Guide',desc:'Pick a food and discover herbs and seasonings that pair beautifully with it.',items:['🍗 Chicken','🍝 Pasta','🥦 Vegetables','🍲 Soup','🥔 Potatoes','🥚 Eggs']},
+ dinner:{title:'🍝 The Dinner Station — Dinner Generator',desc:'Tell Lil Dino what kind of dinner mood you are in and get an idea to try.',items:['⚡ Quick & Easy','🍲 Cozy & Comforting','🥗 Fresh & Light','🌶️ Something Flavorful','🍝 Pasta Night','🌮 Taco/Mexican Night','🥘 One-Pan Dinner','🎲 Surprise Me!']},
+ baking:{title:'🍪 The Baking Corner — Baking Lab',desc:'A little baking lab for swaps, troubleshooting, flavor ideas, and challenges.',items:['🧁 Baking basics','🔄 Ingredient swaps','🛠️ Troubleshooting','🍓 Flavor combos','🎯 Baking challenges','❓ What Happens If…?']},
+ cafe:{title:'☕ The Cozy Café — Café Corner',desc:'Step into Lil Dino’s tiny café for a drink or snack idea with a fun café twist.',items:['☀️ Fresh & Fruity','🍫 Sweet & Cozy','☕ Coffeehouse','🧊 Cool & Refreshing','🥐 Breakfast Café','🎲 Surprise Me!']},
+ prep:{title:'🧊 The Prep Counter — Kitchen Skills Lab',desc:'Practice the little kitchen skills that make cooking easier and more fun.',items:['🔪 Chop & Cut','🥄 Measure It','🥣 Mix & Prep','🔥 Cooking Basics','🧼 Kitchen Safety','🎯 Skill Challenge']},
+ secret:{title:'✨ The Secret Recipe Room — Mystery Quest',desc:'Shhh... Lil Dino has been hiding something delicious.',items:['🎲 Mystery Recipe','🔐 Hidden Recipes','🌎 Secret Around-the-World Recipe','🎃 Seasonal Secrets','🧩 Recipe Challenge','🎁 Mystery Box']},
+ trash:{title:'🗑️ The Kitchen Trash Can — Before You Toss It!',desc:'Before you throw scraps away, see whether they can be used, eaten, or composted.',items:['🍊 Citrus peels','🥔 Potato peels','🥚 Eggshells','🥦 Broccoli stems','🌿 Herb stems','🍎 Apple peels','🍌 Banana peels','⚠️ Safety first — when in doubt, throw it out']},
+ hq:{title:'🦖 Lil Dino’s Kitchen HQ',desc:'This is home base for Little Dino’s Kitchen Adventures!',items:['💗 Cook','🗺️ Explore','✨ Discover','🐹 Meet Lil Dino’s tiny hamster-dragon adventure buddy!']}
+};
+const panel=document.getElementById('panel'),title=document.getElementById('roomTitle'),desc=document.getElementById('roomDesc'),list=document.getElementById('roomList');
+document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{const r=rooms[b.dataset.room];title.textContent=r.title;desc.textContent=r.desc;list.innerHTML=r.items.map(x=>`<li>${x}</li>`).join('');panel.classList.add('show');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}));
+document.getElementById('close').onclick=()=>panel.classList.remove('show');
+</script>
+</body></html>
