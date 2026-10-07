@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explore Lil Dino's Kitchen</title>
+<style>
+:root{--cream:#fff8e8;--green:#315c36;--pink:#f28ba8;--brown:#8a5a3b;--soft:#fff0f4;--deep:#a94c6a}
+*{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--green);font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center}
+.wrap{max-width:1200px;margin:auto;padding:18px 12px 34px}.title{font-weight:800;font-size:clamp(25px,4vw,44px);color:var(--pink);margin:4px 0 2px}.sub{margin:0 0 16px;font-size:clamp(15px,2vw,20px);color:var(--green)}
+.map{position:relative;width:100%;overflow:hidden;border-radius:22px;box-shadow:0 8px 28px rgba(70,45,20,.18);background:#fff}.map img{display:block;width:100%;height:auto}
+.hotspot{position:absolute;background:transparent;border:0;padding:0;cursor:pointer;z-index:2}.hotspot:focus-visible{outline:3px solid #fff;border-radius:18px;box-shadow:0 0 0 5px var(--pink)}
+.panel{display:none;margin:18px auto 0;max-width:900px;background:var(--soft);border:3px solid #f7b0c3;border-radius:20px;padding:18px;text-align:left;box-shadow:0 5px 18px rgba(70,45,20,.1)}
+.panel.show{display:block}.panel h2{margin:0 0 8px;color:var(--deep);font-size:clamp(22px,3vw,30px);padding-right:75px}.panel p{margin:0 0 12px;line-height:1.5}.close{float:right;border:0;background:var(--pink);color:white;font-weight:800;border-radius:999px;padding:8px 15px;cursor:pointer}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-top:12px}.choice{border:2px solid #f2b1c3;background:#fff;border-radius:14px;padding:10px;color:var(--green);font-weight:700;text-align:left;cursor:pointer}.choice:hover,.choice:focus{background:#ffe5ed}.detail{margin-top:14px;background:white;border-radius:15px;padding:14px;border-left:5px solid var(--pink)}.detail h3{margin:0 0 7px;color:var(--deep)}.detail ul{margin:7px 0 0 20px;padding:0;line-height:1.55}.tip{margin-top:10px;padding:10px 12px;background:#fff8d9;border-radius:12px}.back{margin-top:12px;border:0;background:#315c36;color:#fff;border-radius:999px;padding:8px 14px;font-weight:800;cursor:pointer}.note{margin-top:12px;font-size:13px;opacity:.75}
+.searchBox{margin:14px 0 12px;padding:13px;background:#fff;border:2px solid #f7b0c3;border-radius:16px}.searchBox label{display:block;font-weight:800;color:var(--deep);margin-bottom:8px}.searchRow{display:flex;gap:8px}.searchRow input{flex:1;min-width:0;border:2px solid #e8b8c7;border-radius:12px;padding:10px 12px;font:inherit;color:var(--green);background:#fff}.searchRow button{border:0;border-radius:12px;padding:10px 15px;background:var(--pink);color:#fff;font-weight:800;font:inherit;cursor:pointer}.searchHint{font-size:12px;margin-top:7px;opacity:.72}.searchResult{margin-top:12px;background:#fff;border-radius:15px;padding:14px;border-left:5px solid #6FAF45}
+.devNote{font-size:.92em;opacity:.82;margin-top:14px;padding-top:12px;border-top:1px solid #f0b8c8;}.searchResult h3{margin:0 0 7px;color:var(--deep)}.searchResult ul{margin:7px 0 0 20px;padding:0;line-height:1.55}
+.pantry{left:13%;top:22%;width:20%;height:12%}.fridge{left:1%;top:45%;width:18%;height:13%}.herb{left:36%;top:23%;width:19%;height:13%}.dinner{left:53%;top:25%;width:23%;height:13%}.baking{right:10%;top:25%;width:20%;height:13%}.cafe{right:0%;top:43%;width:18%;height:16%}.prep{left:39%;top:53%;width:21%;height:15%}.secret{right:1%;top:62%;width:20%;height:15%}.trash{right:0%;bottom:1%;width:21%;height:15%}.hq{left:4%;bottom:1%;width:25%;height:25%}
+@media (max-width:600px){.wrap{padding:10px 7px 24px}.map{border-radius:14px}.panel{padding:14px;border-radius:15px}.note{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">🗺️ Explore Lil Dino's Kitchen</h1>
+  <p class="sub">Where should we explore today?<br>Pick a destination and start your adventure! ✨</p>
+  <div class="map" aria-label="Interactive map of Lil Dino's kitchen">
+    <img src="kitchen-map.png" alt="Little Dino's Kitchen Adventures map with Lil Dino on a pink step stool and his hamster-dragon pet beside him">
+    <button class="hotspot pantry" aria-label="Open Pantry" data-room="pantry"></button>
+    <button class="hotspot fridge" aria-label="Open Fridge" data-room="fridge"></button>
+    <button class="hotspot herb" aria-label="Open Herb Garden" data-room="herb"></button>
+    <button class="hotspot dinner" aria-label="Open Dinner Station" data-room="dinner"></button>
+    <button class="hotspot baking" aria-label="Open Baking Corner" data-room="baking"></button>
+    <button class="hotspot cafe" aria-label="Open Cozy Cafe" data-room="cafe"></button>
+    <button class="hotspot prep" aria-label="Open Prep Counter" data-room="prep"></button>
+    <button class="hotspot secret" aria-label="Open Secret Recipe Room" data-room="secret"></button>
+    <button class="hotspot trash" aria-label="Open Kitchen Trash" data-room="trash"></button>
+    <button class="hotspot hq" aria-label="Open Lil Dino's Kitchen HQ" data-room="hq"></button>
+  </div>
+  <section class="panel" id="panel" aria-live="polite">
+    <button class="close" id="close">Close</button>
+    <h2 id="roomTitle"></h2><p id="roomDesc"></p>
+    <div class="searchBox">
+      <label for="roomSearch">🔎 Search this kitchen room</label>
+      <div class="searchRow"><input id="roomSearch" type="search" autocomplete="off" placeholder="Try strawberries, chicken, brown sugar..."><button id="searchBtn">Search</button></div>
+      <div class="searchHint" id="searchHint"></div>
+    </div>
+    <div id="choices" class="choices"></div>
+    <div id="detail"></div>
+  </section>
+  <div class="note">Tap a sign in the kitchen to explore. 🦖💗</div>
+</div>
+<script>
+const rooms={
+fridge:{title:'🥛 The Fridge — Food Freshness Guide',desc:'Pick a food and Lil Dino will show you simple ways to store it, keep it fresh, and know when to use it first.',items:{
+'🍓 Strawberries':['Keep them dry and refrigerated. Don’t wash the whole batch until you are ready to eat them.','Remove any berries that are moldy or leaking so they don’t spoil the others.','For cut strawberries, use a clean covered container and refrigerate them.'],
+'🐉 Dragon Fruit':['Keep a whole dragon fruit in the refrigerator when you want to slow ripening and keep it fresh longer.','Keep it dry and uncut until you are ready to use it.','Once cut, put the pieces in a clean airtight container and refrigerate.'],
+'🍌 Bananas':['Keep uncut bananas at room temperature until ripe.','Once they are as ripe as you like, you can refrigerate them to slow further ripening; the peel may darken.','Keep cut banana pieces covered and refrigerated.'],
+'🍎 Apples':['Store apples in the refrigerator to help them stay crisp longer.','Keep them away from foods that can be affected by the natural gases apples give off.','Check for soft or spoiled spots and remove damaged pieces.'],
+'🥬 Lettuce':['Refrigerate lettuce and keep it as dry as possible.','A clean container or bag with a paper towel can help absorb extra moisture.','Remove wilted or slimy leaves before the rest is affected.'],
+'🫐 Berries':['Refrigerate berries and keep them dry until you are ready to eat them.','Wash gently just before eating rather than washing the whole container ahead of time.','Remove moldy berries right away.'],
+'🥛 Milk':['Keep milk refrigerated and return it to the fridge promptly after pouring.','Keep the carton closed and store it toward the back of the refrigerator rather than in the warmest door area.','When in doubt about safety, follow the package date/storage guidance and throw it out if it has been mishandled.'],
+'🥚 Eggs':['Keep eggs refrigerated in their original carton.','Avoid leaving eggs sitting out for long periods.','For hard-cooked eggs, refrigerate them in a covered container.'],
+'🥩 Meat & Chicken':['Keep raw meat and chicken refrigerated and sealed so juices cannot drip onto other foods.','Use a separate cutting board or wash and sanitize surfaces after raw meat.','If you are not using it soon, freeze it in a well-sealed package.'],
+'🍞 Bread':['Keep bread sealed at room temperature if you will use it soon.','For longer storage, freezing helps prevent staleness.','If you see mold on soft bread, discard the loaf rather than cutting around the mold.'] }},
+pantry:{title:'🍓 The Pantry — Pantry Master',desc:'Pick a pantry item to learn how to store it, organize it, and know when to use it first.',items:{'🌾 Flour':['Keep flour tightly sealed in a cool, dry place.','For longer storage, especially whole-grain flour, refrigeration or freezing can help preserve quality.'],'🍚 Rice':['Store dry rice in a cool, dry place in a sealed container.','Keep moisture and pantry pests out.'],'🍝 Pasta':['Keep dry pasta sealed in a cool, dry pantry.','Label opened packages if you move them into containers.'],'🥫 Canned Foods':['Store unopened cans in a cool, dry place.','Use cans that are not swollen, leaking, badly rusted, or badly damaged.'],'🧈 Butter':['Refrigerate butter unless your package specifically says otherwise.','For longer storage, freeze well-wrapped butter.'],'🍫 Chocolate Chips':['Keep them tightly sealed in a cool, dry place away from strong odors.','Avoid heat that can cause melting or bloom.']}},
+herb:{title:'🌿 The Herb Garden — Herb & Seasoning Guide',desc:'Pick a food and get a simple flavor plan.',items:{'🍗 Chicken':['Try garlic + rosemary + thyme.','For a brighter flavor, add lemon and parsley.'],'🍝 Pasta':['Try basil + oregano + garlic.','Finish with Parmesan, black pepper, or a little chili flake.'],'🥦 Vegetables':['Try garlic + parsley + lemon.','For roasted vegetables, rosemary or thyme works well.'],'🍲 Soup':['Try thyme + parsley for cozy soups.','Taste first, then add salt a little at a time.'],'🥔 Potatoes':['Try rosemary + garlic + black pepper.','Paprika adds a warm savory note.'],'🥚 Eggs':['Try chives + black pepper.','Dill or parsley also works beautifully.']}},
+dinner:{title:'🍝 The Dinner Station — Dinner Generator',desc:'Pick your mood and Lil Dino gives you a dinner idea.',items:{'⚡ Quick & Easy':['Try garlic-butter pasta with a side of fruit.'],'🍲 Cozy & Comforting':['Try spaghetti with marinara and garlic bread.'],'🥗 Fresh & Light':['Try a chicken-and-vegetable bowl with lemon.'],'🌶️ Something Flavorful':['Try taco bowls with seasoned meat or beans, rice, salsa, and avocado.'],'🍝 Pasta Night':['Try spaghetti, creamy garlic pasta, or veggie pasta.'],'🌮 Taco/Mexican Night':['Try tacos, quesadillas, or a taco rice bowl.'],'🥘 One-Pan Dinner':['Try chicken and vegetables roasted together on one sheet pan.'],'🎲 Surprise Me!':['Lil Dino says: make a bowl with one protein, one grain, two vegetables, and your favorite sauce!']}},
+baking:{title:'🍪 The Baking Corner — Baking Lab',desc:'Choose a baking topic and get practical guidance, troubleshooting, or substitutions.',items:{'🧁 Baking Basics':['Measure flour carefully instead of packing it into the cup.','Preheat the oven before baking.'],'🔄 Ingredient Swaps':['No butter? Some recipes can use margarine, but the texture may change.','Check the recipe before swapping eggs or leaveners because those changes can affect structure.'],'🛠️ Troubleshooting':['Cookies spreading too much? Chill the dough and check that the butter was not overly melted.','Pancakes too dense? Avoid overmixing the batter.'],'🍓 Flavor Combos':['Try strawberry + vanilla, chocolate + peanut butter, or lemon + blueberry.'],'🎯 Baking Challenge':['Try making a simple batch of cookies and add one safe flavor twist.'],'❓ What Happens If…?':['Tap a baking question and Lil Dino will explain the likely result and how to fix it.']}},
+cafe:{title:'☕ The Cozy Café — Café Corner',desc:'Pick a café mood for a drink and snack idea.',items:{'☀️ Fresh & Fruity':['Strawberry refresher + a fruit cup.'],'🍫 Sweet & Cozy':['Hot chocolate + chocolate chip cookies.'],'☕ Coffeehouse':['Warm milk or a caffeine-free café-style drink + toast or a muffin.'],'🧊 Cool & Refreshing':['Strawberry refresher over ice + fresh fruit.'],'🥐 Breakfast Café':['Toast or a muffin + fruit.'],'🎲 Surprise Me!':['Lil Dino’s café pick: a strawberry drink and a warm baked treat.']}},
+prep:{title:'🧊 The Prep Counter — Kitchen Skills Lab',desc:'Choose a kitchen skill and get a practical, step-by-step guide.',items:{'🔪 Chop & Cut':['Use a stable cutting board and keep fingertips curled away from the blade.','Ask an adult for help with knives when needed.'],'🥄 Measure It':['Use dry measuring cups for dry ingredients and liquid measuring cups for liquids.','Level dry ingredients for more consistent baking.'],'🥣 Mix & Prep':['Read the recipe first, gather ingredients, then mix in the order listed.'],'🔥 Cooking Basics':['Use oven mitts for hot pans and turn pot handles inward.','Never leave cooking food unattended when heat is on.'],'🧼 Kitchen Safety':['Wash hands before cooking and after handling raw meat.','Clean surfaces and utensils after preparing raw foods.'],'🎯 Skill Challenge':['Practice measuring flour, washing fruit, and setting up your ingredients before cooking.']}},
+secret:{title:'✨ The Secret Recipe Room — Mystery Quest',desc:'Pick a mystery and Lil Dino reveals a mini food adventure.',items:{'🎲 Mystery Recipe':['Make a strawberry refresher and serve it with a small fruit snack.'],'🔐 Hidden Recipes':['Secret combo: chocolate chips + banana can become a fun topping for toast or pancakes.'],'🌎 Secret Around-the-World Recipe':['Try a simple taco rice bowl or a pasta dish with a new herb.'],'🎃 Seasonal Secrets':['Pick one seasonal fruit and build a snack around it.'],'🧩 Recipe Challenge':['Choose three ingredients you already have and invent a snack using them.'],'🎁 Mystery Box':['Pick one ingredient, one fruit or vegetable, and one pantry staple. Lil Dino says: create something!']}},
+trash:{title:'🗑️ The Kitchen Trash Can — Before You Toss It!',desc:'Pick a food scrap and see whether it can be eaten, used in a recipe, regrown, composted, or safely tossed.',items:{
+'🍊 Citrus Peels':['Wash the fruit first. Use zest in baking, marinades, dressings, or infused sugar/vinegar.','Recipe ideas: lemon-peel sugar, candied citrus peel, citrus-infused vinegar, or zest in muffins and cakes.','Compost the peel if your local setup accepts citrus.'],
+'🥔 Potato Peels':['Wash potatoes well. Clean peels can be roasted with oil and seasoning until crisp.','Recipe ideas: crispy potato-peel chips, potato-peel soup/stock, or roasted peel toppings.','Do not use green, heavily sprouted, moldy, or spoiled potato parts.'],
+'🥚 Eggshells':['Eggshells are not a snack. Rinse away egg residue and let them dry before crushing.','Crushed shells can be composted where accepted; some gardeners also use finely crushed shells in garden soil, but they are not a quick fertilizer.','Wash hands after handling raw egg residue.'],
+'🥦 Broccoli Stems':['Peel the tough outer layer and slice the tender center.','Recipe ideas: stir-fries, soups, slaws, roasted vegetable trays, or finely chopped broccoli-stem fritters.','Compost the woody ends if your local system accepts them.'],
+'🌿 Herb Stems':['Tender parsley, cilantro, dill, or basil stems can often be chopped into recipes.','Recipe ideas: herb pesto, chimichurri-style sauces, dressings, soups, stocks, and herb butter.','Woody stems can flavor stock and be strained out.'],
+'🍎 Apple Peels':['Wash apples before using the peel.','Recipe ideas: apple-peel tea, baked apple-peel crisps, oatmeal toppings, muffins, or infused water.','Compost peels that are not being used.'],
+'🍌 Banana Peels':['Banana peel is not something to casually eat raw. Use it only in a recipe designed for it, and wash the banana first.','Recipe ideas: banana-peel curry, banana-peel chutney, banana-peel stir-fry, or a banana-peel “pulled” filling made from cooked shredded peel.','If you do not want to cook with it, compost it where accepted.'],
+'🍓 Strawberry Tops':['Wash strawberries first. The leafy tops can be blended into smoothies, used in infused water, or simmered into a fruit syrup.','Recipe ideas: strawberry-top infused water, strawberry-top syrup, or blended strawberry-top smoothies.','Compost them if you are not using them.'],
+'🍍 Pineapple Scraps':['The peel and core are usually too tough to eat raw.','Recipe ideas: simmer clean peel/core for a pineapple-infused water or tea, or use them in a recipe that specifically calls for pineapple scraps.','Strain out tough pieces and compost what remains if accepted.'],
+'🥕 Carrot Peels':['Wash carrots well. The peels can go into soups, stocks, or roasted vegetable mixes.','Recipe ideas: crispy roasted carrot peels, carrot-peel pesto, vegetable stock, or a roasted peel topping.','Compost clean peels when you are done.'],
+'🧅 Onion Skins':['Onion skins are usually too tough to eat directly.','Recipe idea: add clean skins to stock for color and flavor, then strain them out before serving.','Compost the strained skins if accepted.'],
+'🧄 Garlic Skins':['Garlic skins are usually too papery to eat, but they can add flavor to stock.','Recipe idea: simmer clean skins in vegetable or chicken stock, then strain them out.','Compost afterward if accepted.'],
+'🍄 Shiitake Stems':['Shiitake stems are edible but often tough.','Recipe ideas: mushroom stock, broth, sauces, finely chopped dumpling fillings, or minced stir-fry mixtures.','Trim any hard woody end first.'],
+'🍄 Oyster Mushroom Stems':['Trim the tough base; much of the remaining stem can be cooked.','Recipe ideas: stir-fries, soups, sauces, or chopped mushroom fillings.'],
+'🍄 Enoki Bases':['Trim the compact root/base before cooking. The individual mushrooms are usable; the trimmed base is usually discarded or composted if accepted.'],
+'🍄 Button Mushroom Stems':['Button mushroom stems are generally edible.','Recipe ideas: omelets, soups, sauces, sautés, or chopped mushroom fillings.'],
+'🫚 Ginger Peel':['Wash ginger well. The peel can flavor tea, broth, stock, or infused water.','Recipe ideas: ginger-peel tea, ginger broth, or an aromatic stock.','🌱 Yes! Ginger can sometimes regrow from a healthy piece with a bud. Visit Dino Grow & Learn for instructions.'],
+'🌱 Green Onion Ends':['Clean green onion ends can be added to stock, sauces, soups, or stir-fries.','🌱 Yes! Green onions are one of the easiest scraps to regrow. Visit Dino Grow & Learn for instructions.'],
+'🌱 Scallion Ends':['Clean scallion ends can be used in stock, sauces, soups, or stir-fries.','🌱 Yes! Scallions can regrow from their rooted ends. Visit Dino Grow & Learn for instructions.'],
+'🌱 Lemongrass':['Outer layers and woody stalk ends can flavor curry, broth, stock, or tea; strain out tough pieces.','🌱 Yes! Lemongrass can regrow from a fresh stalk base. Visit Dino Grow & Learn for instructions.'],
+'🍃 Makrut Lime Leaves & Stems':['The leaves are useful in cooking; tough stems can be removed.','Recipe ideas: curry pastes, soups, stir-fries, or finely sliced leaf ribbons. Compost tough stems if accepted.'],
+'🌶️ Chili Stems':['Chili stems are usually removed before cooking.','Compost or toss them if they are not being used for flavoring a stock.'],
+'🥬 Napa Cabbage Outer Leaves':['Fresh outer leaves are edible after washing.','Recipe ideas: stir-fries, soups, wraps, kimchi-style preparations, or cabbage slaw.','Remove leaves that are slimy, moldy, or spoiled.'],
+'🥬 Daikon Tops':['Fresh daikon greens are edible after washing.','Recipe ideas: sautéed greens, soups, stir-fries, pesto-style sauces, or mixed greens.','🌱 Some daikon can regrow from suitable tops. Visit Dino Grow & Learn for instructions.'],
+'🥬 Radish Tops':['Fresh radish greens are edible after washing.','Recipe ideas: sautéed greens, pesto, soups, or grain bowls.','🌱 Some radishes can regrow from suitable tops. Visit Dino Grow & Learn for instructions.'],
+'🍠 Taro Peels':['Do not eat taro peel raw. Taro itself must be thoroughly cooked.','The peel is better composted or tossed.'],
+'🎃 Kabocha Rind':['Kabocha rind is commonly edible when cooked. Wash it well and cook it thoroughly.','Recipe ideas: roasted kabocha wedges, soups, curries, or stews where the rind softens during cooking.'],
+'🎃 Kabocha Seeds':['Clean kabocha seeds can be roasted and eaten.','Recipe idea: roast the seeds with oil and seasoning for a crunchy snack or soup topping.'],
+'🌽 Corn Husks':['Clean corn husks can be used as food wrappers or for steaming.','Recipe ideas: steamed tamales or other wrapped foods where a corn husk is part of the cooking method.','Compost used husks where accepted.'],
+'🍙 Nori Scraps':['Good nori scraps can be crumbled into rice, soups, noodles, salads, or seasoning mixes.','Toss nori if it is stale, wet, moldy, or spoiled.'],
+'🫛 Edamame Pods':['Edamame pods are usually not eaten.','Compost them where accepted, or discard them according to your local waste rules.'],
+'🍃 Banana Leaves':['Clean banana leaves can be used as food wrappers or liners, but they are not eaten.','Recipe uses include steaming, grilling, or serving food on the leaf.','Compost them where accepted.'],
+'🥥 Coconut Shell & Fiber':['Coconut shell and coarse fiber are not edible.','Reuse or compost them only where your local system accepts them; many municipal compost programs do not take hard shells.'],
+'🍵 Tea Leaves':['Loose tea leaves can usually be composted.','Used leaves can also be mixed into some baked goods or rice dishes if the tea is a food-safe culinary variety and the texture works.'],
+'🍵 Tea Bags':['Compost a tea bag only if it is plastic-free and accepted by your local compost system; many conventional bags contain plastic.','If unsure, remove the tea leaves and discard the bag according to local waste rules.'],
+'🥢 Bamboo Skewers':['Bamboo skewers are objects, not food scraps. Reuse them if appropriate or follow your local trash/compost rules.'],
+'🥢 Chopsticks':['Chopsticks are objects, not food scraps. Reuse them if appropriate or follow your local trash/compost rules.'],
+'⚠️ Safety First':['If a scrap is moldy, spoiled, contaminated, or you are unsure about its safety, throw it away. Do not taste questionable food just to find out.']}},grow:{title:'🌱 Dino Grow & Learn',desc:'Some kitchen scraps can grow again. Pick one to learn what to save, how to start it, and what to expect.',items:{
+'🧅 Green Onions':['Save the white rooted base with a little green attached.','Stand the roots in a shallow cup of water in a bright spot. Change the water every few days.','Once new green growth appears, move it to soil if you want longer-term growth.'],
+'🥬 Lettuce':['Save the bottom core after removing the leaves.','Set the core in a shallow dish with a little water and place it in bright light.','New leaves may regrow, but the plant may not produce a full new head like the original.'],
+'🥬 Bok Choy':['Save the bottom base with the root end intact.','Place it in a shallow dish with a little water and bright light.','After new growth appears, transplant it to soil for a longer growing attempt.'],
+'🌿 Herbs':['Some fresh herb cuttings can root in water, especially soft-stem herbs such as basil or mint.','Place a clean cutting in water with the lower leaves removed and change the water regularly.','Once roots develop, plant it in potting soil and keep the soil appropriately moist.'],
+'🧄 Garlic':['Plant a healthy garlic clove with the pointed end up in loose soil.','Keep the soil lightly moist and give it plenty of sunlight.','Garlic greens can be harvested earlier; a full bulb takes much longer and depends on the variety and growing conditions.'],
+'🫚 Ginger':['Save a fresh piece with visible buds or “eyes.”','Plant it shallowly in moist, well-draining soil with the buds facing up.','Keep it warm and lightly moist. Ginger takes time, so this is a patience quest.'],
+'🌱 Lemongrass':['Save a fresh stalk base that still has the thicker root end.','Place the base in a little water in a bright spot and change the water regularly.','When roots develop, plant it in soil and keep it warm and watered.'],
+'🥕 Carrot Tops':['Save the leafy top rather than the long root.','Place the top in a shallow dish of water. It can regrow greens, but it will not grow a new carrot root from the top.','Use the greens as a garnish or in cooking when fresh.'],
+'🍠 Sweet Potato':['A sweet potato can produce slips—new shoots that can become plants.','Place a healthy sweet potato partly in water or soil in a warm, bright spot and wait for shoots.','Once slips develop roots, they can be planted in soil.'],
+'🍍 Pineapple':['A pineapple crown can sometimes root and grow into a new pineapple plant.','Remove excess fruit from the crown base, let the cut area dry, then root it in water or plant it in well-draining soil.','Pineapples take a long time to mature, especially indoors.'],
+'🥑 Avocado':['A healthy avocado pit can sometimes sprout, but growing a fruit-producing tree from a pit takes years and may not reproduce the parent fruit exactly.','Clean the pit, start it in water or moist soil, and give it warmth and bright light.','Think of this one as a fun growing experiment more than a quick food supply.']}},
+hq:{title:'🦖 Lil Dino’s Kitchen HQ',desc:'Home base for Little Dino’s Kitchen Adventures!',items:{'💗 Cook':['Choose a recipe and start cooking.'],'🗺️ Explore':['Tap another kitchen destination.'],'✨ Discover':['Try a guide you have not explored yet.'],'🐹 Meet the Adventure Buddy':['Lil Dino’s tiny hamster-dragon buddy is ready for the next quest!']}}
+};
+const panel=document.getElementById('panel'),title=document.getElementById('roomTitle'),desc=document.getElementById('roomDesc'),choices=document.getElementById('choices'),detail=document.getElementById('detail');
+const roomSearch=document.getElementById('roomSearch'),searchBtn=document.getElementById('searchBtn'),searchHint=document.getElementById('searchHint');
+
+const searchData={
+fridge:{
+  hints:'Search a food—even if it is not one of the examples below.',
+  examples:{
+    'dragon fruit':['Whole dragon fruit can be kept in the refrigerator to slow ripening. Keep it dry and uncut until ready to use. Once cut, refrigerate the pieces in a clean airtight container.'],
+    strawberries:['Keep strawberries dry and refrigerated. Do not wash the whole batch until you are ready to eat them. Remove moldy or leaking berries.'],
+    blueberries:['Refrigerate blueberries and keep them dry until ready to eat. Wash gently just before eating.'],
+    raspberries:['Refrigerate raspberries and keep them dry. Remove spoiled berries promptly so they do not affect the rest.'],
+    grapes:['Refrigerate grapes in a breathable container or their original package. Wash them just before eating for best quality.'],
+    peaches:['Keep unripe peaches at room temperature until they soften, then refrigerate to slow further ripening.'],
+    nectarines:['Let firm nectarines ripen at room temperature, then refrigerate once ripe.'],
+    avocado:['Let a whole avocado ripen at room temperature. Once ripe, refrigerate it to slow further ripening. Cover cut avocado and refrigerate.'],
+    tomatoes:['Keep ripe tomatoes at room temperature for best flavor. Refrigerate only if you need to slow very ripe tomatoes briefly.'],
+    cucumber:['Refrigerate cucumbers and keep them dry. Use promptly if they become soft or slimy.'],
+    carrots:['Refrigerate carrots. Remove leafy tops if attached and keep carrots in a bag or container to reduce moisture loss.'],
+    spinach:['Refrigerate spinach and keep excess moisture under control. Remove slimy leaves promptly.'],
+    yogurt:['Keep yogurt refrigerated and return it to the fridge promptly. Follow the package storage directions.'],
+    cheese:['Keep cheese refrigerated in appropriate wrapping or a covered container. Follow the package guidance for the specific cheese.'],
+    chicken:['Keep raw chicken sealed and refrigerated. If you will not use it soon, freeze it. Keep raw juices away from ready-to-eat foods.'],
+    beef:['Keep raw beef sealed and refrigerated. Freeze it for longer storage and keep raw juices away from other foods.'],
+    fish:['Keep fresh fish very cold and use it promptly. For longer storage, freeze it in a well-sealed package.'],
+    bread:['Keep bread sealed at room temperature if you will use it soon. Freeze it for longer storage. If soft bread has mold, discard the loaf.'],
+    'green beans':['Refrigerate green beans and keep them reasonably dry. Use them before they become limp or slimy.']
+  },
+  fallback:q=>{
+    const fruit=['orange','oranges','apple','apples','pear','pears','mango','mangos','pineapple','watermelon','melon','kiwi','lemon','lemons','lime','limes','grapefruit','plum','plums','cherry','cherries'];
+    const berry=['berry','berries','strawberry','strawberries','blueberry','blueberries','raspberry','raspberries','blackberry','blackberries'];
+    const leafy=['lettuce','spinach','kale','arugula','greens','cabbage'];
+    const veg=['carrot','carrots','cucumber','peppers','pepper','broccoli','cauliflower','celery','zucchini','squash','green beans','corn','mushroom','mushrooms'];
+    const dairy=['milk','cream','half and half','yogurt','cheese','cottage cheese','sour cream'];
+    const meat=['chicken','beef','pork','turkey','meat','steak','ground beef','ground turkey'];
+    const seafood=['fish','salmon','shrimp','seafood','tuna','cod'];
+    const bread=['bread','tortilla','tortillas','bagel','bagels','rolls','bun','buns'];
+    if(fruit.some(x=>q.includes(x))) return `For ${q}, keep it whole and dry until you are ready to use it. Most whole fruit can be kept at room temperature while it ripens, then refrigerated once ripe if you want to slow further ripening. Store cut fruit covered in the refrigerator and use it promptly. Keep bruised or spoiled pieces away from the rest. For the exact food, follow its package or food-safety guidance.`;
+    if(berry.some(x=>q.includes(x))) return `For ${q}, refrigerate it and keep it dry. Wash berries just before eating rather than washing the whole container in advance. Remove moldy or leaking berries promptly. Once cut or prepared, keep them covered and refrigerated.`;
+    if(leafy.some(x=>q.includes(x))) return `For ${q}, refrigerate it and keep excess moisture under control. A clean container or bag with a paper towel can help. Remove slimy or spoiled leaves promptly so they do not affect the rest.`;
+    if(veg.some(x=>q.includes(x))) return `For ${q}, refrigerate it unless the specific food is normally stored at room temperature. Keep it reasonably dry, use a clean bag or container when helpful, and remove spoiled pieces promptly. Once cut, keep it covered and refrigerated.`;
+    if(dairy.some(x=>q.includes(x))) return `For ${q}, keep it refrigerated and return it to the refrigerator promptly after use. Keep the package closed and follow the label for storage and use-by guidance. If it has been left warm too long or you are unsure about safety, discard it rather than guessing.`;
+    if(meat.some(x=>q.includes(x))) return `For ${q}, keep it sealed and refrigerated until you are ready to cook it. Put raw meat on a tray or in a leak-proof container so juices cannot reach other foods. If you will not use it soon, freeze it. Keep raw meat separate from ready-to-eat foods and clean surfaces after handling it.`;
+    if(seafood.some(x=>q.includes(x))) return `For ${q}, keep it very cold and use it promptly. Keep it sealed or in a leak-proof container so juices cannot contaminate other foods. For longer storage, freeze it well sealed. Keep raw seafood separate from ready-to-eat foods.`;
+    if(q.includes('egg')) return `For ${q}, keep eggs refrigerated in their original carton. Avoid leaving them at room temperature for long periods. For cooked eggs, refrigerate them in a covered container and follow food-safety guidance for storage time.`;
+    if(bread.some(x=>q.includes(x))) return `For ${q}, keep it sealed at room temperature if you will use it soon. For longer storage, freezing helps preserve quality. If soft bread has visible mold, discard the loaf rather than cutting around the mold.`;
+    const mysteryReplies=[
+      `🦖🔎 Mystery food! Lil Dino does not recognize ${q} yet — but that is fixable. Is it a fruit, vegetable, meat, seafood, dairy food, bread, or something else? Give me that tiny clue and I can point you toward the right storage approach.`,
+      `🦖❓ Hmm... ${q} has entered the kitchen without an introduction. 😂 Tell Lil Dino what kind of food it is (fruit, vegetable, meat, seafood, dairy, bread, etc.), and he will help you figure out how to keep it fresh.`,
+      `🦖🧐 Lil Dino is stumped on ${q}. No wild guessing here! Give me one clue about what it is, and I will help you work out whether it belongs in the fridge, pantry, freezer, or somewhere else.`,
+      `🦖💗 I do not have a specific guide for ${q} yet, but we can still solve it. Tell Lil Dino what kind of food it is, and he will help you find the safest storage strategy.`,
+      `🦖😂 Well... ${q} just caught Lil Dino off guard. I do not recognize it yet! Give me a clue — fruit, vegetable, meat, seafood, dairy, bread, or something else — and we can investigate.`,
+      `🦖🤨 ${q}? Lil Dino has questions. 😂 Before we invent a storage rule out of thin air, tell me what kind of food it is and I will help narrow down the best way to store it.`,
+      `🦖✨ New kitchen mystery unlocked: ${q}! I do not have a specific entry for it yet. Give me its food category, and Lil Dino can help you figure out the right freshness plan.`,
+      `🦖📚 Lil Dino has not learned ${q} yet. That is okay! Tell me whether it is a fruit, vegetable, meat, seafood, dairy food, bread, or another type of food, and we can start there.`
+    ];
+    return mysteryReplies[Math.floor(Math.random()*mysteryReplies.length)];
+  }
+},
+pantry:{hints:'Search a pantry item, spice, grain, or shelf-stable ingredient.',examples:{
+  'brown sugar':['Keep tightly sealed in a cool, dry pantry. If it becomes hard, an airtight container helps prevent moisture loss.'],
+  'powdered sugar':['Keep sealed in a cool, dry pantry away from moisture and strong odors.'],
+  oats:['Store oats tightly sealed in a cool, dry place.'],
+  'cornmeal':['Keep cornmeal sealed in a cool, dry pantry; refrigeration can help extend quality for longer storage.'],
+  quinoa:['Keep dry quinoa sealed in a cool, dry pantry.'],
+  'olive oil':['Keep olive oil tightly capped in a cool, dark place away from heat and light.'],
+  honey:['Keep honey tightly closed at room temperature in a dry place. Crystallization is normal and does not mean it has spoiled.'],
+  'peanut butter':['Keep according to the label; many commercial peanut butters can be kept in the pantry after opening, while some natural products recommend refrigeration.'],
+  spices:['Keep spices tightly closed in a cool, dry, dark place.'],
+  'maple syrup':['Refrigerate opened pure maple syrup and follow the bottle directions.'],
+  vinegar:['Keep vinegar tightly closed in a cool, dark pantry.']},fallback:q=>`For ${q}, keep it sealed, cool, dry, and away from heat, moisture, pests, and strong odors. Check the package for any special storage directions.`},
+herb:{hints:'Search a food to get herb and seasoning ideas.',examples:{salmon:['Try dill + lemon + parsley.'],beef:['Try rosemary + garlic + black pepper.'],rice:['Try cilantro + lime or parsley + garlic.'],beans:['Try cumin + garlic + oregano.'],carrots:['Try thyme + parsley + a little butter.'],corn:['Try chili powder + lime + cilantro.'],mushrooms:['Try thyme + garlic + parsley.'],shrimp:['Try garlic + parsley + lemon.']},fallback:q=>`For ${q}, start with one fresh herb plus one savory seasoning, then taste and adjust. Lil Dino suggests trying parsley, basil, thyme, rosemary, dill, oregano, or cilantro depending on the dish.`},
+dinner:{hints:'Search an ingredient or meal idea and Lil Dino will suggest a dinner.',examples:{chicken:['Try chicken tacos, a chicken-and-rice bowl, or sheet-pan chicken with vegetables.'],beef:['Try beef tacos, spaghetti with meat sauce, or a one-pan beef and vegetable dinner.'],salmon:['Try lemon-herb salmon with rice and vegetables.'],potatoes:['Try loaded baked potatoes, potato tacos, or roasted potatoes with chicken.'],rice:['Try taco rice bowls, fried rice, or chicken-and-rice bowls.'],eggs:['Try breakfast-for-dinner with eggs, toast, fruit, and roasted potatoes.'],beans:['Try bean tacos, burrito bowls, or a cozy bean-and-rice dinner.']},fallback:q=>`For ${q}, build dinner with one main ingredient, one grain or starch, one or two vegetables, and a sauce or seasoning you like.`},
+baking:{hints:'Search a specific ingredient, baking problem, or substitution.',examples:{banana:['Use ripe banana in pancakes, muffins, or cookies; mashed banana can add moisture and sweetness.'],apples:['Try apple + cinnamon + brown sugar in muffins or baked oatmeal.'],lemon:['Try lemon + blueberry, lemon + vanilla, or lemon + poppy seed.'],cocoa:['Cocoa powder pairs well with chocolate chips, vanilla, peanut butter, or banana.'],oats:['Oats work well in cookies, baked oatmeal, crumble toppings, and muffins.'],'no eggs':['Some baked goods can use mashed banana, applesauce, or a commercial egg replacer, but the result may change. Check the recipe before swapping.']},fallback:q=>`For ${q}, tell Lil Dino what you are trying to bake and what ingredients you have. He can suggest a flavor pairing or a likely baking approach, but major swaps can change texture.`},
+cafe:{hints:'Search a fruit, drink flavor, or snack idea.',examples:{peach:['Try a peach refresher, peach iced tea, or peach-and-yogurt snack.'],blueberry:['Try a blueberry lemonade-style refresher or blueberry yogurt cup.'],banana:['Try a banana smoothie or banana-and-peanut-butter toast.'],apple:['Try an apple-cinnamon warm drink or an apple snack plate.'],mango:['Try a mango refresher or mango-and-yogurt cup.'],lemon:['Try a lemon refresher or lemon-and-mint water.']},fallback:q=>`For ${q}, Lil Dino suggests pairing it with a refreshing drink, a simple fruit snack, or a small baked treat.`},
+prep:{hints:'Choose a skill below, then search within that skill for a specific task or measurement.',examples:{onion:['Use a stable cutting board and a sharp chef’s knife. Cut the onion in half through the root, peel it, make controlled lengthwise cuts, then crosswise cuts. Keep your fingertips curled and out of the blade’s path.'],shallot:['Trim the stem end, cut the shallot in half through the root, peel it, then make lengthwise and crosswise cuts while keeping your fingertips curled. For a fine mince, make the cuts closer together.'],chicken:['For raw chicken, use a separate cutting board. Pat the chicken dry, remove any packaging or excess skin you do not want, and use a sharp knife to separate joints rather than cutting through bone. Keep the chicken cold while you work and wash/sanitize surfaces afterward.'],"cut a chicken":['For a whole chicken, place it breast-side up on a stable board. Remove the legs at the joints, then separate thighs from drumsticks. Remove the wings at their joints, and use the breastbone as a guide when removing the breast meat. Keep raw chicken and its juices away from ready-to-eat foods.'],garlic:['Use a stable cutting board. Crush a clove with the flat side of a chef’s knife, remove the skin, then mince with a controlled rocking motion.'],tomato:['Use a stable cutting board and a suitable knife. Slice with a smooth forward-and-back motion and keep your fingertips curled.'],avocado:['Cut the avocado lengthwise around the pit on a stable board. Twist the halves apart. For safety, remove the pit with a spoon rather than striking it with a knife.'],measuring:['Use dry measuring cups for dry ingredients and liquid measuring cups for liquids. For flour, spoon it into the cup and level it rather than packing it down.'],"how many ounces is one cup of flour":['One US cup of all-purpose flour is about 4.25 ounces by weight (about 120 grams). For baking, a kitchen scale is the most accurate way to measure flour.'],"1 cup flour":['One US cup of all-purpose flour is about 4.25 ounces by weight (about 120 grams). A scale gives the most consistent result.'],mixing:['Read the recipe first, gather the ingredients, and mix in the order listed. Stop mixing when the recipe says “just combined” to avoid developing too much gluten in many baked goods.']},fallback:q=>`For ${q}, start with a stable work surface, the correct tool, and the recipe’s instructions. For knife work or raw meat, use appropriate food-safety practices and ask an adult for help if needed.`},
+secret:{hints:'Search an ingredient or flavor combo for a mystery quest.',examples:{strawberries:['Mystery quest: strawberry pancakes or a strawberry refresher.'],chocolate:['Mystery quest: chocolate chip cookies or chocolate-and-banana toast.'],banana:['Mystery quest: banana pancakes or banana + chocolate snack toast.'],lemon:['Mystery quest: strawberry-lemon refresher or lemon-herb dinner.'],cinnamon:['Mystery quest: cinnamon apple snack or cinnamon pancakes.']},fallback:q=>`Mystery quest unlocked for ${q}! Pair it with one fruit or vegetable and one pantry staple, then invent a snack or simple meal.`},
+trash:{hints:'Search a food scrap to see whether it can be eaten, used in a recipe, regrown, composted, or tossed.',examples:{
+'banana peel':['Banana peel is best used in a recipe designed for it rather than eaten raw.','Recipe ideas: banana-peel curry, banana-peel chutney, banana-peel stir-fry, or a cooked shredded banana-peel filling.','If you do not want to cook with it, compost it where accepted.'],
+'eggshells':['Eggshells are not a snack. Rinse away residue and let them dry before crushing.','They can be composted where accepted. They are not a quick fertilizer, but crushed shells can be added to some garden compost/soil setups.'],
+'egg shells':['Eggshells are not a snack. Rinse away residue and let them dry before crushing.','They can be composted where accepted.'],
+'potato peels':['Recipe ideas: crispy potato-peel chips, roasted potato peels, or potato-peel stock/soup.','Wash well and avoid green or spoiled potato parts.'],
+'carrot peels':['Recipe ideas: crispy roasted carrot peels, carrot-peel pesto, vegetable stock, or roasted peel toppings.','Wash the carrots well first.'],
+'shiitake stems':['Recipe ideas: mushroom stock, broth, sauces, or finely chopped fillings.','They are edible but often tough, so cook them well or use them to flavor a stock.'],
+'herb stems':['Recipe ideas: pesto, chimichurri-style sauces, dressings, herb butter, soups, or stocks.','Tender stems work best for direct cooking; woody stems are better for stock.'],
+'ginger peel':['Recipe ideas: ginger-peel tea, ginger broth, stock, or infused water.','🌱 Ginger can sometimes regrow from a healthy budded piece. Visit Dino Grow & Learn.'],
+'green onion ends':['Recipe ideas: stir-fries, soups, stocks, sauces, and garnishes.','🌱 Green onions can regrow from their rooted ends. Visit Dino Grow & Learn.'],
+'lemongrass':['Recipe ideas: curry, broth, stock, or tea using the aromatic stalk pieces; strain out tough parts.','🌱 Lemongrass can regrow from a fresh base. Visit Dino Grow & Learn.'],
+'kabocha seeds':['Recipe idea: roast clean seeds with oil and seasoning for a crunchy snack or soup topping.'],
+'citrus peels':['Recipe ideas: citrus zest in baking, candied peel, citrus sugar, or infused vinegar.','Wash the fruit first and compost the peel if you do not use it.'],
+'broccoli stems':['Recipe ideas: stir-fries, soups, slaws, roasted vegetables, or chopped fritters.','Peel the tough outer layer first.'],
+'napa cabbage outer leaves':['Recipe ideas: stir-fries, soups, wraps, slaws, or fermented cabbage preparations.','Wash and remove any slimy, moldy, or spoiled leaves.'],
+'daikon tops':['Recipe ideas: sautéed greens, soups, stir-fries, pesto-style sauces, or grain bowls.','🌱 Suitable tops may regrow. Visit Dino Grow & Learn.'],
+'radish tops':['Recipe ideas: sautéed greens, pesto, soups, or grain bowls.','🌱 Suitable tops may regrow. Visit Dino Grow & Learn.']},fallback:q=>trashUnknown(q)},
+grow:{hints:'Search a scrap or plant to learn how to regrow it.',examples:{'green onions':['Save the rooted white end, place it in shallow water, change the water every few days, and move it to soil for longer growth.'],'lettuce':['Save the bottom core and place it in a shallow dish of water in bright light. New leaves may regrow, but not always a full new head.'],'bok choy':['Save the base, place it in shallow water, then transplant new growth to soil.'],'ginger':['Plant a fresh piece with visible buds in moist, well-draining soil and keep it warm and lightly moist.'],'lemongrass':['Root a fresh stalk base in water, then plant it in soil once roots develop.'],'carrot tops':['Save the leafy top and grow greens in shallow water. It will not regrow a new carrot root from the top.'],'pineapple':['A healthy crown can root and grow into a pineapple plant, but fruit production takes a long time.'],'avocado':['A pit can sprout as a growing experiment, but fruit production takes years and may not match the original fruit.']},fallback:q=>`🦖 Lil Dino doesn't have a specific growing guide for “${q}” yet. I'm still learning and developing Dino Grow & Learn. Try a green onion, lettuce, bok choy, herb, garlic, ginger, lemongrass, carrot top, sweet potato, pineapple, or avocado.`},
+hq:{hints:'Search the kitchen for a place or adventure.',examples:{recipes:['Choose a recipe from Little Dino’s Recipe Quests.'],map:['Tap a destination on the kitchen map.'],dino:['Meet Lil Dino and his tiny hamster-dragon adventure buddy!']},fallback:q=>`Lil Dino says: search for ${q} and then pick a kitchen destination that helps with it!`}
+};
+
+function normalize(q){return q.trim().toLowerCase().replace(/\s+/g,' ')}
+
+const trashUnknownReplies=[
+  q=>`🦖🤔 I don't know “${q}” yet. I'm still learning and developing the Kitchen Trash Can guide, so I don't have a reliable answer for that one yet. Try a food scrap, peel, stem, shell, or leaf.`,
+  q=>`🦖📚 Hmm… “${q}” isn't in my kitchen-scrap guide yet. I'm still learning and developing this room, and I'm adding more food-scrap guides all the time.`,
+  q=>`🦖🛠️ Lil Dino hasn't learned “${q}” yet! This kitchen room is still being developed, so I don't want to make up an answer. Try another food part and I'll see what I know.`,
+  q=>`🦖🔎 I searched my kitchen-scrap notes for “${q}” and came up empty. I'm still learning and developing this guide, so let's try a different scrap.`,
+  q=>`🦖💭 “${q}”? I don't have a reliable guide for that one yet. I'm still developing the Kitchen Trash Can, so I'd rather say I don't know than guess. Try a peel, stem, shell, leaf, or other food scrap.`
+];
+function trashUnknown(q){return trashUnknownReplies[Math.floor(Math.random()*trashUnknownReplies.length)](q)}
+
+const sarcasticSearchReplies=[
+  q=>`🦖😒 Really? “${q}”? I’m a dinosaur, not NASA. 😂 Try asking me about food or something kitchen-related.`,
+  q=>`🦖🙄 I checked the pantry. I checked the fridge. I even checked under the counter. Nope. Still no ${q}. 😂 Try a food, adventurer.`,
+  q=>`🦖🤨 And exactly what recipe were you planning to make with “${q}”? 😂 Try again, chef.`,
+  q=>`🦖💀 Lil Dino has absolutely no idea what “${q}” means. And honestly… I’m a little concerned. 😭😂 Try a kitchen question.`,
+  q=>`🦖😂 That might be many things, but “${q}” is definitely NOT something I’m putting in the kitchen. Try a food.`,
+  q=>`🦖😏 Bold choice: “${q}.” Unfortunately, this is a kitchen guide, not a search engine for random thoughts. 😂`,
+  q=>`🦖🤦 Buddy… we were talking about food. How did we get to “${q}”? 😂 Try a food or kitchen question.`,
+  q=>`🦖😤 Nope. I refuse to put “${q}” in the fridge. 😂 Try an actual food, chef.`,
+  q=>`🦖💅 “${q}”? Darling, Lil Dino has limits. 😂 Give me a food, ingredient, cooking task, or storage question.`,
+  q=>`🦖🧐 I have investigated “${q}” and the kitchen department has officially rejected the application. 😂 Try something edible.`
+];
+const obviousNonsenseWords=['spaceship','space ship','nasa','unicorn','dragon','pokemon','minecraft','alien','galaxy','planet','time machine','random thought','homework','math problem','car engine','iphone','phone charger','weather forecast','politics','password','wifi','football score','movie spoiler','video game','taxes','bank account','hair','paint','couch','sofa','television','tv','shoe','shoes','car','bicycle','toothbrush','pillow','blanket','remote control','backpack'];
+const kitchenClueWords=['food','fruit','vegetable','veggie','meat','seafood','fish','dairy','bread','grain','rice','pasta','sauce','ingredient','recipe','cook','cooking','bake','baking','kitchen','fridge','freezer','pantry','storage','fresh','leftover','meal','drink','dessert','cookie','cake','flour','sugar','egg','milk','butter','cheese','chicken','beef','pork','turkey','steak','salmon','shrimp','apple','mango','peach','pear','kiwi','melon','watermelon','pomegranate','broccoli','carrot','onion','garlic','pepper','potato','tomato','lemon','lime','strawberry','blueberry','raspberry','blackberry','grape','cucumber','kale','spinach','lettuce','mushroom'];
+function isObviousNonsense(q){
+  const hasNonsense=obviousNonsenseWords.some(x=>q.includes(x));
+  const hasKitchenClue=kitchenClueWords.some(x=>q.includes(x));
+  return hasNonsense && !hasKitchenClue;
+}
+function sarcasticSearch(q){return sarcasticSearchReplies[Math.floor(Math.random()*sarcasticSearchReplies.length)](q)}
+
+function measurementAnswer(q){
+  const s=q.toLowerCase().replace(/,/g,'').replace(/\s+/g,' ').trim();
+  const unitToTsp={tsp:1,teaspoon:1,teaspoons:1,tbsp:3,tablespoon:3,tablespoons:3,cup:48,cups:48};
+  const unitLabel={tsp:'teaspoon(s)',tbsp:'tablespoon(s)',cup:'cup(s)'};
+  const frac={'½':.5,'1/2':.5,'⅓':1/3,'1/3':1/3,'⅔':2/3,'2/3':2/3,'¼':.25,'1/4':.25,'¾':.75,'3/4':.75,'⅛':.125,'1/8':.125,'⅜':.375,'3/8':.375,'⅝':.625,'5/8':.625,'⅞':.875,'7/8':.875};
+  const words={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,half:.5,quarter:.25};
+  const unitRegex='(teaspoons?|tsp|tablespoons?|tbsp|cups?)';
+  const getUnit=u=>{u=u.toLowerCase();if(/^teaspoon|^tsp/.test(u))return'tsp';if(/^tablespoon|^tbsp/.test(u))return'tbsp';if(/^cup/.test(u))return'cup';return null};
+  const getNumber=t=>{
+    if(!t)return null;
+    let m=t.match(/(\d+(?:\.\d+)?|½|⅓|⅔|¼|¾|⅛|⅜|⅝|⅞|\d+\/\d+)/);
+    if(m){let raw=m[1];if(frac[raw]!=null)return frac[raw];if(raw.includes('/')){const [a,b]=raw.split('/').map(Number);return b?a/b:null}return Number(raw)}
+    for(const [w,v] of Object.entries(words))if(new RegExp('\\b'+w+'\\b').test(t))return v;
+    return null;
+  };
+  const format=(n)=>Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):n.toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+
+  // Common baking-weight question. A cup is not a universal weight, so only answer when the ingredient is known.
+  const flour=/\b(flour|all[- ]purpose flour)\b/.test(s);
+  const weightMatch=s.match(/how many ounces.*(?:in|is)\s+(?:a|an|one|1)\s+cup(?:s)?(?:\s+of\s+)?(?:all[- ]purpose\s+)?flour/);
+  if(weightMatch || (/\bounces\b/.test(s)&&/\b(one|1)\s+cup\b/.test(s)&&flour)){
+    return 'One US cup of all-purpose flour is about <strong>4.25 ounces (120 grams)</strong> by weight. For baking, a kitchen scale is the most accurate option.';
+  }
+
+  // Natural question: "How many tablespoons are in one cup?"
+  let m=s.match(new RegExp('how many\\s+'+unitRegex+'\\s+(?:are\\s+)?in\\s+(?:a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\\d+(?:\\.\\d+)?|½|⅓|⅔|¼|¾|⅛|⅜|⅝|⅞|\\d+\\/\\d+)\\s+'+unitRegex));
+  if(m){
+    const target=getUnit(m[1]), source=getUnit(m[2]);
+    const phrase=m[0];
+    const numText=phrase.match(/(?:in\s+)(a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|\d+(?:\.\d+)?|½|⅓|⅔|¼|¾|⅛|⅜|⅝|⅞|\d+\/\d+)\s+/);
+    const n=getNumber(numText&&numText[1]);
+    if(target&&source&&n!=null&&target!==source){
+      const result=n*unitToTsp[source]/unitToTsp[target];
+      return `There are <strong>${format(result)} ${unitLabel[target]}</strong> in ${format(n)} ${unitLabel[source]}.`;
+    }
+  }
+
+  // Conversion wording: "How many tablespoons is 1 cup?", "How many cups is 16 tbsp?", "10 tsp in tbsp"
+  const pair=[...s.matchAll(new RegExp('\\b'+unitRegex+'\\b','g'))];
+  if(pair.length>=2){
+    const first=getUnit(pair[0][1]), second=getUnit(pair[1][1]);
+    let n=getNumber(s.slice(0,pair[0].index));
+    if(n==null)n=getNumber(s.slice(pair[0].index+pair[0][0].length,pair[1].index));
+    if(n==null)n=getNumber(s.slice(pair[1].index+pair[1][0].length));
+    if(first&&second&&n!=null&&first!==second){
+      const result=n*unitToTsp[first]/unitToTsp[second];
+      return `There are <strong>${format(result)} ${unitLabel[second]}</strong> in ${format(n)} ${unitLabel[first]}.`;
+    }
+  }
+  return null;
+}
+
+function formatSearchResult(key,val){
+  return `<div class="searchResult"><h3>🔎 ${key}</h3><ul>${val.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+
+let currentRoom=null;
+let currentSkill=null;
+
+function showRoom(key){
+  currentRoom=key;
+  currentSkill=null;
+  const r=rooms[key];
+  title.textContent=r.title;
+  desc.textContent=r.desc;
+  choices.innerHTML='';
+  detail.innerHTML='';
+  roomSearch.value='';
+  roomSearch.placeholder='Search this room...';
+  searchHint.textContent=(searchData[key]&&searchData[key].hints)||'Search this room for more ideas.';
+  Object.keys(r.items).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='choice';
+    b.textContent=k;
+    b.onclick=()=>showDetail(k);
+    choices.appendChild(b);
+  });
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function showDetail(k){
+  const r=rooms[currentRoom];
+  const tips=r.items[k];
+  currentSkill=k;
+  roomSearch.value='';
+  roomSearch.placeholder=`Search ${k.replace(/^[^\w]+/,'')}...`;
+  searchHint.textContent=`Search specifically within “${k.replace(/^[^\w]+/,'')}”.`;
+  detail.innerHTML=`<div class="detail"><h3>${k}</h3><ul>${tips.map(x=>`<li>${x}</li>`).join('')}</ul>${currentRoom==='fridge'?'<div class="tip">🦖 Food-safety note: Keep perishable foods cold, prevent cross-contamination, and follow the package or food-safety guidance for the specific food.</div>':''}<button class="back" onclick="backToChoices()">↩ Back to choices</button></div>`;
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function backToChoices(){
+  currentSkill=null;
+  roomSearch.value='';
+  roomSearch.placeholder='Search this room...';
+  searchHint.textContent=(searchData[currentRoom]&&searchData[currentRoom].hints)||'Search this room for more ideas.';
+  detail.innerHTML='';
+}
+
+const cleaningGuide = {
+  lemon: {
+    title:'🍋 Lemon',
+    tip:'Lemon can freshen washable surfaces and help cut light grime. Use a little juice, then wipe with a clean damp cloth.',
+    safety:'⚠️ Avoid lemon on marble, granite, and other natural stone because the acid can damage the surface. It is not a disinfectant.'
+  },
+  lime: {
+    title:'🍈 Lime',
+    tip:'Lime can help freshen washable surfaces and loosen light grime. Use a small amount of juice, then wipe the surface clean.',
+    safety:'⚠️ Like lemon, lime is acidic and can damage marble, granite, and other natural stone. It is not a disinfectant.'
+  },
+  orange: {
+    title:'🍊 Orange',
+    tip:'Orange peel contains fragrant citrus oils that can help freshen surfaces and loosen some greasy residue. Use it on a suitable washable surface, then wipe clean.',
+    safety:'⚠️ Citrus oils are not a disinfectant. Avoid citrus on natural stone and test a small hidden area first.'
+  },
+  grapefruit: {
+    title:'🍊 Grapefruit',
+    tip:'Grapefruit can help freshen washable surfaces and its juice can loosen light grime.',
+    safety:'⚠️ Grapefruit is acidic and should not be used on marble, granite, or other natural stone. It is not a disinfectant.'
+  },
+  vinegar: {
+    title:'🥣 White Vinegar',
+    tip:'White vinegar can help dissolve mineral buildup and freshen some washable kitchen surfaces.',
+    safety:'⚠️ Do not mix vinegar with bleach or other cleaning chemicals. Avoid natural stone such as marble and granite.'
+  },
+  'baking soda': {
+    title:'🥄 Baking Soda',
+    tip:'Baking soda is a mild abrasive that can help scrub grime and absorb odors. Make a simple paste with water when appropriate.',
+    safety:'⚠️ Avoid using abrasive pastes on delicate, polished, or easily scratched surfaces.'
+  },
+  'dish soap': {
+    title:'🫧 Dish Soap',
+    tip:'Dish soap is one of the most useful everyday kitchen cleaners. Dilute it with water for washable surfaces and greasy messes.',
+    safety:'⚠️ Rinse food-contact surfaces well after cleaning. Follow the product label for special surfaces.'
+  },
+  'dishwashing liquid': {
+    title:'🫧 Dishwashing Liquid',
+    tip:'Dishwashing liquid works well for everyday grease and washable kitchen surfaces. Dilute with water and wipe clean.',
+    safety:'⚠️ Rinse food-contact surfaces well after cleaning and follow the product label.'
+  },
+  salt: {
+    title:'🧂 Salt',
+    tip:'Salt can provide gentle scrubbing action for some sturdy kitchen surfaces and cookware when used with care.',
+    safety:'⚠️ Salt can scratch delicate finishes, so test a small area first and avoid it on easily scratched surfaces.'
+  },
+  'cream of tartar': {
+    title:'🥄 Cream of Tartar',
+    tip:'Cream of tartar can be used in some gentle cleaning pastes, especially for certain metal surfaces.',
+    safety:'⚠️ Check that the surface is compatible before scrubbing and test a small hidden area first.'
+  }
+};
+
+function getCleaningKey(q){
+  const aliases = [
+    ['dishwashing liquid','dishwashing liquid'],
+    ['dish soap','dish soap'],
+    ['baking soda','baking soda'],
+    ['cream of tartar','cream of tartar'],
+    ['white vinegar','vinegar'],
+    ['vinegar','vinegar'],
+    ['grapefruit','grapefruit'],
+    ['orange','orange'],
+    ['lemon','lemon'],
+    ['lime','lime'],
+    ['salt','salt']
+  ];
+  for(const [needle,key] of aliases){
+    if(q.includes(needle)) return key;
+  }
+  return null;
+}
+
+function cleaningResponse(q){
+  const key=getCleaningKey(q);
+  if(!key) return null;
+  const item=cleaningGuide[key];
+  return `<div class="searchResult"><h3>🧽🦖 What Can I Do With This?</h3><h4>${item.title}</h4><p>${item.tip}</p><p>${item.safety}</p><p class="smallNote">Lil Dino's rule: useful for cleaning does not automatically mean safe for every surface or strong enough to disinfect.</p><p class="smallNote">🍳 Want recipes or food ideas instead? Search the ingredient normally and Lil Dino will use the regular kitchen guide.</p></div>`;
+}
+
+function searchRoom(){
+  const q=normalize(roomSearch.value);
+  if(!q){
+    detail.innerHTML='<div class="searchResult"><h3>🔎 What should we explore?</h3><p>Type a specific food, task, ingredient, measurement, or question.</p></div>';
+    return;
+  }
+
+  // Ask Lil Dino whether a fruit or kitchen ingredient can be useful for cleaning.
+  const asksAboutCleaning = q.includes('what can i do with') || q.includes('what can i do with this') || q.includes('can i clean with') || q.includes('use this to clean') || q.includes('cleaning') || q.includes('clean this');
+  const cleaningAnswer = cleaningResponse(q);
+  // Cleaning answers are shown only when the user asks about cleaning.
+  // A normal ingredient/produce search continues to the regular kitchen/recipe guide.
+  if(cleaningAnswer && asksAboutCleaning){
+    detail.innerHTML=cleaningAnswer;
+    detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+
+  // Lil Dino reserves the sass for searches that are clearly unrelated to food or kitchens.
+  if(isObviousNonsense(q)){
+    detail.innerHTML=`<div class="searchResult"><h3>🦖😂 Kitchen Search Rejected</h3><p>${sarcasticSearch(q)}</p><p class="devNote">🛠️ This website is still being developed, so Lil Dino may not recognize everything you ask about yet. We’re adding more food and kitchen guides all the time!</p></div>`;
+    detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+
+  // Measure It gets a real conversion answer instead of a generic kitchen guide.
+  if(currentRoom==='prep' && currentSkill && normalize(currentSkill.replace(/^[^\w]+/,''))==='measure it'){
+    const measurement=measurementAnswer(q);
+    if(measurement){
+      detail.innerHTML=`<div class="searchResult"><h3>🥄 Measurement Answer</h3><p>${measurement}</p><p class="smallNote">Kitchen conversion note: teaspoons, tablespoons, and cups are volume measurements. Ingredient weights can differ, so a cup of flour does not weigh the same as a cup of sugar.</p></div>`;
+      detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+      return;
+    }
+  }
+
+  const r=searchData[currentRoom]||{};
+  const entries=r.examples||{};
+  let found=null;
+
+  // When a category is selected, first look for an exact match for that category's topic.
+  for(const [key,val] of Object.entries(entries)){
+    const k=normalize(key);
+    if(q===k || k.includes(q) || q.includes(k)){found={key,val};break;}
+  }
+
+  if(found){
+    detail.innerHTML=formatSearchResult(found.key,found.val);
+  }else{
+    const isFallback = !r.fallback;
+        detail.innerHTML=`<div class="searchResult"><h3>🦖 Lil Dino's guide for ${q}</h3><p>${isFallback?'I don’t have a specific entry for that yet. Try a more specific food, task, ingredient, or question.':r.fallback(q)}</p>${isFallback?'<p class="devNote">🛠️ This website is still being developed, so Lil Dino may not recognize everything you ask about yet. We’re adding more food and kitchen guides all the time!</p>':''}</div>`;
+  }
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>showRoom(b.dataset.room)));
+
+document.getElementById('close').onclick=()=>panel.classList.remove('show');
+searchBtn.addEventListener('click',searchRoom);
+roomSearch.addEventListener('keydown',e=>{if(e.key==='Enter')searchRoom()});
+</script>
+</body></html>
