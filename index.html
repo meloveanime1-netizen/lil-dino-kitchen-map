@@ -379,5 +379,41 @@ document.getElementById('roomList').addEventListener('click', function(e) {
     document.getElementById('roomList').after(box);
   }
   box.textContent = prepTips[key];
+});
+  
+document.getElementById('prepMore')?.remove();
+
+const prepMore = {
+  'Cutting Skills': 'KNIFE BASICS\nUse a stable cutting board. Trim the ends off an onion, cut it in half through the root, peel it, then slice toward the root without cutting through it. For shallots, halve lengthwise and slice thinly. Keep fingertips curled back and use a sharp knife carefully.',
+  'Preparing Meat Safely': 'MEAT SAFETY\nUse a separate board for raw chicken. Keep it away from ready-to-eat foods. Do not wash raw chicken because splashes can spread germs. Cook chicken to 165°F (74°C) in the thickest part, using a food thermometer. Wash hands and clean surfaces after handling raw meat.',
+  'Measurements & Conversions': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1 stick butter = 1/2 cup = 8 tablespoons = 113 g.\n1 cup all-purpose flour ≈ 120 g; 1 cup granulated sugar ≈ 200 g. Flour weights vary, so use the recipe’s weight when provided.',
+  'Ingredient Substitutions': 'QUICK SWAPS\nButtermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Rest 5–10 minutes.\nSour cream: plain yogurt often works in cakes and quick breads.\nSubstitutions can change flavor and texture, so use a tested recipe when possible.',
+  'Ingredient Prep Tips': 'PREP SMARTER\nRead the recipe first. Wash produce under running water and dry it before cutting. Measure ingredients before mixing. Keep raw meat and its utensils separate from produce. Follow the recipe’s ingredient sizes and prep instructions.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Prep Counter')) return;
+
+  const text = item.textContent;
+  const key = Object.keys(prepMore).find(k => text.includes(k));
+  if (!key) return;
+
+  let box = document.getElementById('prepMore');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'prepMore';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = prepMore[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    const box = document.getElementById('prepMore');
+    if (box) box.remove();
+  });
+});
 </script>
 </body></html>
