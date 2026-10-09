@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explore Lil Dino's Kitchen</title>
+<style>
+:root{--cream:#fff8e8;--green:#315c36;--pink:#f28ba8;--brown:#8a5a3b}
+*{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--green);font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center}
+.wrap{max-width:1200px;margin:auto;padding:18px 12px 34px}.title{font-weight:800;font-size:clamp(25px,4vw,44px);color:var(--pink);margin:4px 0 2px}.sub{margin:0 0 16px;font-size:clamp(15px,2vw,20px);color:var(--green)}
+.map{position:relative;width:100%;overflow:hidden;border-radius:22px;box-shadow:0 8px 28px rgba(70,45,20,.18);background:#fff}.map img{display:block;width:100%;height:auto}
+.hotspot{position:absolute;background:transparent;border:0;padding:0;cursor:pointer;z-index:2}
+.hotspot:focus-visible{outline:3px solid #fff;border-radius:18px;box-shadow:0 0 0 5px var(--pink)}
+.panel{display:none;margin:18px auto 0;max-width:900px;background:#fff0f4;border:3px solid #f7b0c3;border-radius:20px;padding:18px;text-align:left;box-shadow:0 5px 18px rgba(70,45,20,.1)}
+.panel.show{display:block}.panel h2{margin:0 0 8px;color:#a94c6a;font-size:clamp(22px,3vw,30px)}.panel p{margin:0 0 10px;line-height:1.5}.panel ul{margin:8px 0 0 20px;padding:0;line-height:1.55}.close{float:right;border:0;background:var(--pink);color:white;font-weight:800;border-radius:999px;padding:7px 12px;cursor:pointer}
+.note{margin-top:12px;font-size:13px;opacity:.75}
+/* Invisible tap areas line up with the destination signs in the artwork. */
+.pantry{left:13%;top:22%;width:20%;height:12%}.fridge{left:1%;top:45%;width:18%;height:13%}.herb{left:34%;top:22%;width:23%;height:16%}.dinner{left:53%;top:25%;width:23%;height:13%}.baking{right:10%;top:25%;width:20%;height:13%}.cafe{right:0%;top:43%;width:18%;height:16%}.prep{left:39%;top:53%;width:21%;height:15%}.secret{right:1%;top:62%;width:20%;height:15%}.trash{right:0%;bottom:1%;width:21%;height:15%}.hq{left:4%;bottom:1%;width:25%;height:25%}
+@media (max-width:600px){.wrap{padding:10px 7px 24px}.map{border-radius:14px}.panel{padding:14px;border-radius:15px}.note{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">🗺️ Explore Lil Dino's Kitchen</h1>
+  <p class="sub">Where should we explore today?<br>Pick a destination and start your adventure! ✨</p>
+  <div class="map" aria-label="Interactive map of Lil Dino's kitchen">
+    <img src="kitchen-map.png" alt="Little Dino's Kitchen Adventures map with Lil Dino on a pink step stool and his hamster-dragon pet beside him">
+    <button class="hotspot pantry" aria-label="Open Pantry" data-room="pantry"></button>
+    <button class="hotspot fridge" aria-label="Open Fridge" data-room="fridge"></button>
+    <button class="hotspot herb" aria-label="Open Herb Garden" data-room="herb"></button>
+    <button class="hotspot dinner" aria-label="Open Dinner Station" data-room="dinner"></button>
+    <button class="hotspot baking" aria-label="Open Baking Corner" data-room="baking"></button>
+    <button class="hotspot cafe" aria-label="Open Cozy Cafe" data-room="cafe"></button>
+    <button class="hotspot prep" aria-label="Open Prep Counter" data-room="prep"></button>
+    <button class="hotspot secret" aria-label="Open Secret Recipe Room" data-room="secret"></button>
+    <button class="hotspot trash" aria-label="Open Kitchen Trash" data-room="trash"></button>
+    <button class="hotspot hq" aria-label="Open Lil Dino's Kitchen HQ" data-room="hq"></button>
+  </div>
+  <section class="panel" id="panel" aria-live="polite">
+    <button class="close" id="close">Close</button>
+    <h2 id="roomTitle"></h2><p id="roomDesc"></p><ul id="roomList"></ul>
+  </section>
+  <div class="note">Tap a sign in the kitchen to explore. 🦖💗</div>
+</div>
+<script>
+const rooms = {
+  pantry: {title:'🍓 The Pantry — Pantry Master', desc:'Organize, store, and use everyday kitchen staples.', items:[
+    ['🫙 Store It','Flour and grains: keep tightly sealed in a cool, dry cupboard. Whole-wheat flour lasts longer in the refrigerator or freezer. Keep oils away from heat and sunlight.'],
+    ['🧺 Organize It','Group baking supplies, grains, canned goods, snacks, and seasonings. Put frequently used items at eye level and label containers with the name and date.'],
+    ['🌾 Learn About It','Flour provides structure in baking; rice and pasta are pantry staples; beans provide protein and fiber; oils add fat and help carry flavor.'],
+    ['⏰ Use It First','Check dates and packages regularly. Use older safe items first, but discard food with mold, pests, damaged packaging, or an unusual smell.']
+  ]},
+  fridge: {title:'🥛 The Fridge — Food Freshness Guide', desc:'Choose a food for practical storage and freshness advice.', items:[
+    ['🍓 Strawberries','Refrigerate unwashed and dry; remove damaged berries and wash just before eating. Use promptly if soft or leaking.'],
+    ['🐉 Dragon Fruit','Keep an uncut ripe dragon fruit in the refrigerator. Once cut, cover it in a clean container and use within a few days.'],
+    ['🥬 Lettuce & Greens','Refrigerate dry leaves in a container or bag with a paper towel to absorb extra moisture. Replace the towel if it becomes wet.'],
+    ['🍌 Bananas','Keep unripe bananas at room temperature. Refrigerate ripe bananas to slow further ripening; the peel may darken.'],
+    ['🥛 Milk & Dairy','Keep dairy at 40°F (4°C) or below, preferably on an interior shelf rather than the door. Return it to the fridge promptly.'],
+    ['🥩 Meat & Chicken','Store raw meat in a leakproof container on the lowest shelf. Refrigerate promptly or freeze; cook chicken to 165°F (74°C).'],
+    ['🥚 Eggs','Keep eggs in their carton inside the refrigerator, not in the door.'],
+    ['🍞 Bread','Store bread sealed in a cool, dry place; freeze extra bread for longer storage.']
+  ]},
+  herb: {title:'🌿 The Herb Garden — Herb & Seasoning Guide', desc:'Tap an ingredient to see seasonings that pair well with it.', items:[
+    ['🍗 Chicken','Rosemary, thyme, garlic, paprika, lemon, and black pepper work well with roasted or grilled chicken.'],
+    ['🍝 Pasta','Basil, oregano, parsley, garlic, and black pepper pair well with pasta. Add delicate fresh herbs near the end.'],
+    ['🥦 Vegetables','Try thyme with roasted vegetables, dill with carrots or peas, and garlic with mushrooms or green beans.'],
+    ['🍲 Soup','Bay leaf, thyme, parsley, and black pepper add depth. Remove bay leaves before serving.'],
+    ['🥔 Potatoes','Rosemary, garlic, paprika, chives, and black pepper are good choices for roasted or mashed potatoes.'],
+    ['🥚 Eggs','Chives, dill, parsley, smoked paprika, and black pepper complement eggs. Add fresh herbs near the end.']
+  ]},
+  dinner: {title:'🍝 The Dinner Station — Dinner Generator', desc:'Choose a dinner mood for an idea you can adapt to what you have.', items:[
+    ['⚡ Quick & Easy','Try a veggie-and-egg fried rice, a quesadilla with beans and cheese, or pasta tossed with garlic, oil, and vegetables.'],
+    ['🍲 Cozy & Comforting','Make a hearty soup, baked potato with toppings, or a simple pasta bake. Add vegetables and a protein to make it a fuller meal.'],
+    ['🥗 Fresh & Light','Build a grain bowl with greens, chopped vegetables, beans or chicken, and a lemony dressing.'],
+    ['🌶️ Something Flavorful','Season with garlic, cumin, paprika, chili, or curry powder. Add a little at a time and taste as you go.'],
+    ['🍝 Pasta Night','Combine cooked pasta with sautéed vegetables and tomato sauce or olive oil, garlic, and herbs. Save a little pasta water to loosen the sauce.'],
+    ['🌮 Taco Night','Fill tortillas with beans, cooked meat, or vegetables; add salsa, cabbage, cheese, and lime.'],
+    ['🥘 One-Pan Dinner','Roast chopped vegetables and a suitable protein on a sheet pan. Cut pieces evenly and ensure meat reaches a safe internal temperature.'],
+    ['🎲 Surprise Me!','Try a baked potato bar: serve potatoes with beans, cheese, leftover cooked vegetables, and a sauce or dressing.']
+  ]},
+  baking: {title:'🍪 The Baking Corner — Baking Lab', desc:'Practical baking help, measurements, swaps, and flavor ideas.', items:[
+    ['🧁 Baking Basics','Read the recipe first. Measure flour by spooning it into the cup and leveling it, unless the recipe gives weights. Preheat the oven fully.'],
+    ['🔄 Ingredient Swaps','For a buttermilk substitute, add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Rest 5–10 minutes.'],
+    ['🥄 Measurements','1 US cup = 16 tablespoons = 48 teaspoons. One cup of all-purpose flour weighs about 120 g, but ingredient weights vary.'],
+    ['🔥 Baking Tips','Avoid opening the oven repeatedly. Check doneness near the recipe’s earliest suggested time, and let baked goods cool as directed.'],
+    ['🍓 Flavor Combos','Try strawberry + lemon, apple + cinnamon, chocolate + espresso, or vanilla + almond. Start with small amounts of strong flavorings.'],
+    ['❓ What Happens If…?','Changing flour, fat, sugar, or leavening can change texture and rise. Make one small change at a time when experimenting.'],
+    ['🎯 Baking Challenges','Choose a familiar recipe and try one new flavor or topping. Write down any changes so you can repeat a successful result.']
+  ]},
+  cafe: {title:'☕ The Cozy Café — Drinks & Treats', desc:'Simple café favorites to make at home.', items:[
+    ['☕ Coffee & Tea','For brewed coffee, start with about 1–2 tablespoons ground coffee per 6 ounces of water and adjust to taste. Green tea often tastes better with water below boiling.'],
+    ['🍓 Refreshing Drinks','Mash 3–4 sliced strawberries with 1 teaspoon sugar. Add 1 cup cold water or chilled tea, lemon, and ice. Taste before adding more sugar.'],
+    ['🍰 Café Treats','Layer yogurt, fruit, and granola for a parfait, or make cinnamon toast with butter and cinnamon sugar.'],
+    ['🍯 Syrups & Flavor Ideas','Try vanilla + cinnamon, strawberry + lemon, caramel + coffee, or honey + ginger tea. Add a little syrup at a time.'],
+    ['🧊 Ice & Serving Tips','Large ice cubes melt more slowly. Freeze leftover coffee in an ice tray for iced coffee. Refrigerate milk-based drinks and discard after 2 hours at room temperature.']
+  ]},
+  prep: {title:'🧊 The Prep Counter — Kitchen Skills Lab', desc:'Practical skills for prepping ingredients safely and confidently.', items:[
+    ['🔪 Cutting Skills','Use a stable cutting board. For an onion, trim the top, halve through the root, peel, and slice with fingertips curled back. Peel and slice shallots lengthwise.'],
+    ['🐔 Preparing Meat Safely','Do not wash raw chicken; splashes can spread germs. Use a separate board and utensils, wash hands, and cook chicken to 165°F (74°C).'],
+    ['🥄 Measurements & Conversions','1 cup = 16 tablespoons = 48 teaspoons. 1 tablespoon = 3 teaspoons. 1 stick of butter = ½ cup = 8 tablespoons. 1 cup all-purpose flour is about 120 g.'],
+    ['🔄 Ingredient Substitutions','Plain yogurt can often replace sour cream in baked goods. Substitutions may change texture; use a tested recipe for important baking ratios.'],
+    ['🧅 Ingredient Prep Tips','Read the recipe before starting. Wash produce under running water and dry it before cutting. Keep raw meat and its utensils separate from ready-to-eat foods.']
+  ]},
+  secret: {title:'✨ The Secret Recipe Room — Mystery Quest', desc:'A small challenge to spark your next kitchen adventure.', items:[
+    ['🎲 Mystery Recipe','Pick three ingredients you have, including one vegetable or fruit, and build a meal around a grain, pasta, or potato.'],
+    ['🔐 Hidden Recipes','Try a simple base recipe in a new way: add herbs to scrambled eggs, vegetables to pasta, or fruit to yogurt.'],
+    ['🌎 Around-the-World Idea','Choose a cuisine to explore, then look for a reliable recipe and check that you have the needed ingredients and equipment.'],
+    ['🎃 Seasonal Secrets','Use produce that is in season locally for better flavor and often better value.'],
+    ['🧩 Recipe Challenge','Make a dish using one ingredient you already have and avoid buying a special ingredient unless it is essential.'],
+    ['🎁 Mystery Box','Choose one pantry staple, one fresh ingredient, and one seasoning. Find a recipe that uses all three.']
+  ]},
+  trash: {title:'🗑️ Before You Toss It!', desc:'Some scraps can be used or composted, but food safety comes first.', items:[
+    ['🍊 Citrus Peels','Use clean citrus zest in baking or dressings. Avoid the bitter white pith when zesting.'],
+    ['🥔 Potato Peels','Clean peels can be roasted until crisp with a little oil and seasoning. Do not use green or heavily sprouted potatoes.'],
+    ['🥚 Eggshells','Eggshells can be composted where accepted. Wash hands and surfaces after handling raw eggs; do not treat shells as a calcium supplement without reliable guidance.'],
+    ['🥦 Broccoli Stems','Peel the tough outer layer, then slice or grate the tender stem for stir-fries, slaw, or soup.'],
+    ['🌿 Herb Stems','Tender parsley and cilantro stems can be chopped into sauces, soups, or stocks. Remove woody stems.'],
+    ['🍎 Apple Peels','Clean apple peels can be added to smoothies or simmered for a mild fruit tea.'],
+    ['🍌 Banana Peels','Banana peels are usually best composted rather than eaten unless following a tested recipe.'],
+    ['⚠️ Safety First','When scraps are moldy, spoiled, contaminated, or you are unsure they are safe, throw them away. Compost only what your system accepts.']
+  ]},
+  hq: {title:'🦖 Lil Dino’s Kitchen HQ', desc:'Home base for Little Dino’s Kitchen Adventures.', items:[
+    ['💗 Cook','Pick a recipe that matches your time, ingredients, and comfort level. Read it through before you start.'],
+    ['🗺️ Explore','Choose a room on the map for storage, seasoning, meal ideas, baking, or kitchen skills.'],
+    ['✨ Discover','Try one new ingredient, technique, or flavor pairing at a time.'],
+    ['🐹 Meet the Adventure Buddy','Lil Dino’s little companion is ready to explore—keep your real pets away from food prep surfaces and ingredients.']
+  ]}
+};
+const panel=document.getElementById('panel');
+const title=document.getElementById('roomTitle');
+const desc=document.getElementById('roomDesc');
+const list=document.getElementById('roomList');
+let activeRoom='';
+function openRoom(key){
+ const room=rooms[key]; if(!room) return;
+ activeRoom=key; title.textContent=room.title; desc.textContent=room.desc;
+ list.innerHTML=room.items.map((item,i)=>`<li tabindex="0" role="button" data-item="${i}" style="cursor:pointer;margin:7px 0;padding:4px 2px">${item[0]}</li>`).join('');
+ const old=document.getElementById('roomTip'); if(old) old.remove();
+ panel.classList.add('show');
+}
+document.querySelectorAll('.hotspot').forEach(button=>button.addEventListener('click',()=>openRoom(button.dataset.room)));
+document.getElementById('close').addEventListener('click',()=>panel.classList.remove('show'));
+function showTip(itemIndex){
+ const item=rooms[activeRoom]?.items[itemIndex]; if(!item) return;
+ let tip=document.getElementById('roomTip');
+ if(!tip){tip=document.createElement('p');tip.id='roomTip';tip.style.cssText='white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.55';list.after(tip);}
+ tip.textContent=item[1];
+}
+list.addEventListener('click',event=>{const item=event.target.closest('li[data-item]');if(item)showTip(Number(item.dataset.item));});
+list.addEventListener('keydown',event=>{const item=event.target.closest('li[data-item]');if(item&&(event.key==='Enter'||event.key===' ')){event.preventDefault();showTip(Number(item.dataset.item));}});
+</script>
+</body></html>
