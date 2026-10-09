@@ -332,5 +332,52 @@ document.querySelectorAll('.hotspot').forEach(function(button) {
         '<li>🧊 Ice & Serving Tips</li>';
     }
   });
-</script>
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'prep') {
+      document.getElementById('roomTitle').textContent = '🔪 Prep Counter — Kitchen Skills Lab';
+      document.getElementById('roomDesc').textContent = 'Practical skills to help you prep ingredients safely and confidently.';
+      document.getElementById('roomList').innerHTML =
+        '<li>🔪 Cutting Skills</li>' +
+        '<li>🐔 Preparing Meat Safely</li>' +
+        '<li>🥄 Measurements & Conversions</li>' +
+        '<li>🔄 Ingredient Substitutions</li>' +
+        '<li>🧅 Ingredient Prep Tips</li>';
+    }
+    const old = document.getElementById('prepTip');
+    if (old) old.remove();
+  });
+});
+
+const prepTips = {
+  'Cutting Skills': 'KNIFE BASICS\nUse a stable cutting board. Trim the ends of an onion, cut it in half through the root, peel it, and slice safely with curled fingertips. For shallots, peel and slice lengthwise.',
+  'Preparing Meat Safely': 'MEAT SAFETY\nUse a separate board for raw chicken. Keep it away from ready-to-eat foods, and do not wash raw chicken. Cook chicken to 165°F (74°C), checking the thickest part with a food thermometer.',
+  'Measurements & Conversions': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1/2 cup = 8 tablespoons.\n1 cup of all-purpose flour weighs about 120 g; weight varies by ingredient.',
+  'Ingredient Substitutions': 'QUICK SWAPS\n1 cup buttermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Wait 5–10 minutes.\nPlain yogurt can often replace sour cream in baked goods. Swaps may change texture.',
+  'Ingredient Prep Tips': 'PREP SMARTER\nRead the recipe first. Wash produce under running water and dry it before cutting. Measure ingredients before you begin, and keep raw meat and its utensils separate from other foods.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Prep Counter')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Cutting Skills')) key = 'Cutting Skills';
+  else if (text.includes('Preparing Meat Safely')) key = 'Preparing Meat Safely';
+  else if (text.includes('Measurements')) key = 'Measurements & Conversions';
+  else if (text.includes('Ingredient Substitutions')) key = 'Ingredient Substitutions';
+  else if (text.includes('Ingredient Prep Tips')) key = 'Ingredient Prep Tips';
+  if (!key) return;
+
+  let box = document.getElementById('prepTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'prepTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = prepTips[key];
+});</script>
 </body></html>
