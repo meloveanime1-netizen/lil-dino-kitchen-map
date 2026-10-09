@@ -415,5 +415,23 @@ document.querySelectorAll('.hotspot').forEach(function(button) {
     if (box) box.remove();
   });
 });
-</script>
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'prep') {
+      document.getElementById('roomTitle').textContent = '🔪 Prep Counter — Kitchen Skills Lab';
+      document.getElementById('roomDesc').textContent = 'Practical guides for safer prep, measurements, and ingredient swaps.';
+      document.getElementById('roomList').innerHTML =
+        '<li>🔪 Cutting Skills</li>' +
+        '<li>🥩 Preparing Meat Safely</li>' +
+        '<li>🥄 Measurements & Conversions</li>' +
+        '<li>🧾 Ingredient Substitutions</li>' +
+        '<li>🍋 Ingredient Prep Tips</li>';
+    }
+    const tip = document.getElementById('prepTip');
+    if (tip) tip.remove();
+    const more = document.getElementById('prepMore');
+    if (more) more.remove();
+  });
+});</script>
 </body></html>
