@@ -156,5 +156,17 @@ document.querySelectorAll('.hotspot').forEach(function(b) {
     if (box) box.remove();
   });
 });
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'fridge') {
+      document.getElementById('roomList').innerHTML =
+        '<li>🥬 Produce</li>' +
+        '<li>🥩 Meat & Dairy</li>' +
+        '<li>🥚 Eggs</li>' +
+        '<li>❄️ Freeze It</li>' +
+        '<li>👀 Use Me First</li>';
+    }
+  });
+});
 </script>
 </body></html>
