@@ -59,4 +59,34 @@ const panel=document.getElementById('panel'),title=document.getElementById('room
 document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{const r=rooms[b.dataset.room];title.textContent=r.title;desc.textContent=r.desc;list.innerHTML=r.items.map(x=>`<li>${x}</li>`).join('');panel.classList.add('show');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}));
 document.getElementById('close').onclick=()=>panel.classList.remove('show');
 document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.room==='fridge'){list.innerHTML="<li>🍓 Strawberries — Keep refrigerated and dry. Use soft or moldy berries first.</li><li>🐉 Dragon Fruit — Refrigerate ripe fruit for longer freshness.</li><li>🍌 Bananas — Store at room temperature; refrigerate ripe bananas to slow ripening.</li><li>🍎 Apples — Keep refrigerated for longer freshness.</li><li>🥬 Lettuce — Refrigerate in a container or bag with a little airflow.</li><li>🫐 Berries — Refrigerate unwashed and wash just before eating.</li><li>🥛 Milk — Keep cold in the main refrigerator area, not the door.</li><li>🥚 Eggs — Keep refrigerated in their carton.</li><li>🥩 Meat & Chicken — Keep cold and use or freeze promptly.</li><li>🍞 Bread — Store sealed at room temperature; freeze extra bread for longer storage.</li>"}}));</script>
+<script>
+const herbTips = {
+'🍗 Chicken':'🌿 Rosemary, thyme, garlic, and paprika. Great for roasted or grilled chicken.',
+'🍝 Pasta':'🌿 Basil, oregano, and parsley. Basil is especially good in tomato sauces.',
+'🥦 Vegetables':'🌿 Thyme, dill, parsley, and garlic. Try thyme with roasted vegetables.',
+'🍲 Soup':'🌿 Bay leaf, thyme, and parsley. Remove the bay leaf before serving.',
+'🥔 Potatoes':'🌿 Rosemary, garlic, and paprika. Delicious with roasted potatoes.',
+'🥚 Eggs':'🌿 Chives, dill, parsley, and black pepper. Add fresh herbs near the end.'
+};
+document.getElementById('roomList').addEventListener('click', function(e) {
+ const item = e.target.closest('li');
+ if (!item || !document.getElementById('roomTitle').textContent.includes('Herb Garden')) return;
+ const tip = herbTips[Object.keys(herbTips).find(k => item.textContent.includes(k.slice(2)))];
+ if (!tip) return;
+ let box = document.getElementById('herbTip');
+ if (!box) {
+  box = document.createElement('p');
+  box.id = 'herbTip';
+  box.style.cssText = 'background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+  document.getElementById('roomList').after(box);
+ }
+ box.textContent = tip;
+});
+document.querySelectorAll('.hotspot').forEach(function(b) {
+ b.addEventListener('click', function() {
+  const box = document.getElementById('herbTip');
+  if (box) box.remove();
+ });
+});
+</script>
 </body></html>
