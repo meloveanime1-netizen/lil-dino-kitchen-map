@@ -119,5 +119,42 @@ document.querySelectorAll('.hotspot').forEach(function(b) {
   if (box) box.remove();
  });
 });
+const fridgeTips = {
+'Produce': '🍓 PRODUCE FRESHNESS\n\nStrawberries: Refrigerate dry and unwashed; remove moldy berries.\n\nDragon fruit: Refrigerate ripe fruit in a container or bag.\n\nLettuce: Refrigerate in a bag or container; keep it dry.\n\nBerries: Refrigerate unwashed and wash before eating.',
+'Meat & Dairy': '🥩 MEAT & DAIRY SAFETY\n\nChicken and raw meat: Store sealed on the lowest shelf. Use within 1–2 days or freeze.\n\nMilk: Keep in the main refrigerator area, not the door.\n\nKeep your fridge at 40°F (4°C) or colder.',
+'Eggs': '🥚 EGG STORAGE\n\nKeep eggs in their original carton inside the refrigerator, not in the door.\n\nRefrigerate cooked eggs promptly and use within one week.',
+'Freeze It': '❄️ FREEZER TIPS\n\nFreeze extra berries, chopped fruit, bread, cooked rice, and leftovers in airtight containers.\n\nLabel items with the date and remove excess air from freezer bags.',
+'Use Me First': '⏰ USE THESE FIRST\n\nCheck ripe berries, cut fruit, leafy greens, and opened foods regularly.\n\nUse older safe items before newer ones. Throw away food with mold or suspicious spoilage.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Fridge')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Produce')) key = 'Produce';
+  else if (text.includes('Meat & Dairy')) key = 'Meat & Dairy';
+  else if (text.includes('Eggs')) key = 'Eggs';
+  else if (text.includes('Freeze It')) key = 'Freeze It';
+  else if (text.includes('Use Me First')) key = 'Use Me First';
+  if (!key) return;
+
+  let box = document.getElementById('fridgeTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'fridgeTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = fridgeTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(b) {
+  b.addEventListener('click', function() {
+    const box = document.getElementById('fridgeTip');
+    if (box) box.remove();
+  });
+});
 </script>
 </body></html>
