@@ -158,7 +158,8 @@ document.querySelectorAll('.hotspot').forEach(function(b) {
 });
 document.querySelectorAll('.hotspot').forEach(function(button) {
   button.addEventListener('click', function() {
-    if (button.dataset.room === 'fridge') {
+if (button.dataset.room === 'fridge') {
+  document.getElementById('roomTitle').textContent = '🥬 The Fridge — Food Freshness Guide';
       document.getElementById('roomList').innerHTML =
         '<li>🥬 Produce</li>' +
         '<li>🥩 Meat & Dairy</li>' +
