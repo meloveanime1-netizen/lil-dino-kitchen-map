@@ -88,5 +88,36 @@ document.querySelectorAll('.hotspot').forEach(function(b) {
   if (box) box.remove();
  });
 });
+const pantryTips = {
+'Store It': '🫙 STORAGE GUIDE\n\nFlour: Keep sealed in a cool, dry place. Whole-wheat flour lasts longer in the fridge or freezer.\n\nRice: Store airtight in a cool, dry cupboard.\n\nPasta: Keep sealed and dry, away from heat.\n\nBrown sugar: Store airtight to help prevent hardening.\n\nCooking oil: Keep tightly closed away from heat and sunlight.',
+'Organize It': '🧺 ORGANIZE YOUR PANTRY\n\nGroup baking supplies together, keep grains and pasta in one area, and place frequently used ingredients where they are easy to reach. Label containers and keep original package dates.',
+'Learn About It': '🌾 PANTRY STAPLES\n\nFlour helps baked goods hold their structure. Rice and pasta provide carbohydrates. Beans offer plant protein and fiber. Oils add fat and help cook food. Check package labels for ingredients and storage directions.',
+'Use It First': '⏰ USE IT FIRST\n\nCheck dates and packages regularly. Use older items first when they are still safe and in good condition. Discard food with insects, moisture, mold, damaged packaging, or an unusual smell.'
+};
+document.getElementById('roomList').addEventListener('click', function(e) {
+ const item = e.target.closest('li');
+ if (!item || !document.getElementById('roomTitle').textContent.includes('Pantry')) return;
+ const text = item.textContent;
+ let key = '';
+ if (text.includes('Store It')) key = 'Store It';
+ else if (text.includes('Organize It')) key = 'Organize It';
+ else if (text.includes('Learn About It')) key = 'Learn About It';
+ else if (text.includes('Use It First')) key = 'Use It First';
+ if (!key) return;
+ let box = document.getElementById('pantryTip');
+ if (!box) {
+  box = document.createElement('p');
+  box.id = 'pantryTip';
+  box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+  document.getElementById('roomList').after(box);
+ }
+ box.textContent = pantryTips[key];
+});
+document.querySelectorAll('.hotspot').forEach(function(b) {
+ b.addEventListener('click', function() {
+  const box = document.getElementById('pantryTip');
+  if (box) box.remove();
+ });
+});
 </script>
 </body></html>
