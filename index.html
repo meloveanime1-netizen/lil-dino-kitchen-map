@@ -390,48 +390,49 @@ const prepMore = {
   'Ingredient Substitutions': 'QUICK SWAPS\nButtermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Rest 5–10 minutes.\nSour cream: plain yogurt often works in cakes and quick breads.\nSubstitutions can change flavor and texture, so use a tested recipe when possible.',
   'Ingredient Prep Tips': 'PREP SMARTER\nRead the recipe first. Wash produce under running water and dry it before cutting. Measure ingredients before mixing. Keep raw meat and its utensils separate from produce. Follow the recipe’s ingredient sizes and prep instructions.'
 };
+});
+</script>
+  const bakingTips = {
+  '🧁 Baking Basics': 'Preheat the oven first. Use room-temperature eggs and butter when the recipe calls for them. Cool baked goods on a rack.',
+  '🔄 Ingredient Swaps': 'Buttermilk: mix 1 cup milk with 1 tablespoon lemon juice or vinegar; rest 5–10 minutes. Sour cream can often be replaced with plain yogurt in cakes and quick breads. Swaps may change texture.',
+  '🥄 Measurements': '1 cup = 16 tablespoons = 48 teaspoons. 1 tablespoon = 3 teaspoons. 1 stick butter = 1/2 cup = 8 tablespoons = 113 g. 1 cup all-purpose flour is about 120 g; spoon it into the cup and level it.',
+  '🔥 Baking Tips': 'Spoon flour into measuring cups instead of packing it. Measure liquids at eye level. Mix muffins just until combined, use the center oven rack, and set a timer.',
+  '🍓 Flavor Combos': 'Try lemon + blueberry, apple + cinnamon, chocolate + raspberry, banana + walnut, or pumpkin + ginger.',
+  '❓ What Happens If…?': 'Too much flour can make bakes dry. Overmixing muffins can make them tough. Old baking powder can prevent a good rise. Baking soda and baking powder are not interchangeable 1:1.',
+  '🎯 Baking Challenges': 'Choose a recipe, measure carefully, and change only one thing at a time. Compare the result so you learn what works.'
+};
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'baking') {
+      document.getElementById('roomTitle').textContent = '🍪 The Baking Corner — Baking Lab';
+      document.getElementById('roomDesc').textContent = 'Practical baking help, measurements, swaps, and flavor ideas.';
+      document.getElementById('roomList').innerHTML =
+        '<li>🧁 Baking Basics</li>' +
+        '<li>🔄 Ingredient Swaps</li>' +
+        '<li>🥄 Measurements</li>' +
+        '<li>🔥 Baking Tips</li>' +
+        '<li>🍓 Flavor Combos</li>' +
+        '<li>❓ What Happens If…?</li>' +
+        '<li>🎯 Baking Challenges</li>';
+    }
+    const old = document.getElementById('bakingTip');
+    if (old) old.remove();
+  });
+});
 
 document.getElementById('roomList').addEventListener('click', function(e) {
   const item = e.target.closest('li');
-  if (!item || !document.getElementById('roomTitle').textContent.includes('Prep Counter')) return;
-
-  const text = item.textContent;
-  const key = Object.keys(prepMore).find(k => text.includes(k));
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Baking Corner')) return;
+  const key = Object.keys(bakingTips).find(k => item.textContent.includes(k.slice(2)));
   if (!key) return;
-
-  let box = document.getElementById('prepMore');
+  let box = document.getElementById('bakingTip');
   if (!box) {
     box = document.createElement('p');
-    box.id = 'prepMore';
+    box.id = 'bakingTip';
     box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
     document.getElementById('roomList').after(box);
   }
-  box.textContent = prepMore[key];
+  box.textContent = bakingTips[key];
 });
-
-document.querySelectorAll('.hotspot').forEach(function(button) {
-  button.addEventListener('click', function() {
-    const box = document.getElementById('prepMore');
-    if (box) box.remove();
-  });
-});
-
-document.querySelectorAll('.hotspot').forEach(function(button) {
-  button.addEventListener('click', function() {
-    if (button.dataset.room === 'prep') {
-      document.getElementById('roomTitle').textContent = '🔪 Prep Counter — Kitchen Skills Lab';
-      document.getElementById('roomDesc').textContent = 'Practical guides for safer prep, measurements, and ingredient swaps.';
-      document.getElementById('roomList').innerHTML =
-        '<li>🔪 Cutting Skills</li>' +
-        '<li>🥩 Preparing Meat Safely</li>' +
-        '<li>🥄 Measurements & Conversions</li>' +
-        '<li>🧾 Ingredient Substitutions</li>' +
-        '<li>🍋 Ingredient Prep Tips</li>';
-    }
-    const tip = document.getElementById('prepTip');
-    if (tip) tip.remove();
-    const more = document.getElementById('prepMore');
-    if (more) more.remove();
-  });
-});</script>
 </body></html>
