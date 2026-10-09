@@ -319,5 +319,18 @@ document.querySelectorAll('.hotspot').forEach(function(button) {
     if (box) box.remove();
   });
 });
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'cafe') {
+      document.getElementById('roomTitle').textContent = '☕ Cozy Café — Drinks & Treats';
+      document.getElementById('roomDesc').textContent = 'Simple café favorites to make at home.';
+      document.getElementById('roomList').innerHTML =
+        '<li>☕ Coffee & Tea</li>' +
+        '<li>🍓 Refreshing Drinks</li>' +
+        '<li>🍰 Café Treats</li>' +
+        '<li>🍯 Syrups & Flavor Ideas</li>' +
+        '<li>🧊 Ice & Serving Tips</li>';
+    }
+  });
 </script>
 </body></html>
