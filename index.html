@@ -204,5 +204,65 @@ document.querySelectorAll('.hotspot').forEach(function(b) {
     if (box) box.remove();
   });
 });
+document.querySelectorAll('.hotspot').forEach(function(button) {
+button.addEventListener('click', function() {
+if (button.dataset.room === 'baking') {
+document.getElementById('roomTitle').textContent = '🍪 The Baking Corner — Baking Lab';
+document.getElementById('roomDesc').textContent = 'Choose a guide for smarter, tastier bakes.';
+document.getElementById('roomList').innerHTML =
+'<li>🧁 Baking Basics</li>' +
+'<li>🔄 Ingredient Swaps</li>' +
+'<li>🥄 Measurements</li>' +
+'<li>🔥 Baking Tips</li>' +
+'<li>🍓 Flavor Combos</li>' +
+'<li>❓ What Happens If…?</li>' +
+'<li>🎯 Baking Challenges</li>';
+}
+const old = document.getElementById('bakingTip');
+if (old) old.remove();
+});
+});
+
+const bakingTips = {
+'Baking Basics': 'PREP FIRST\nPreheat the oven. Gather and measure ingredients before mixing. Use room-temperature ingredients when the recipe calls for them. Cool baked goods on a rack.',
+'Ingredient Swaps': 'USEFUL SWAPS\nButtermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Wait 5–10 minutes.\nSour cream: plain yogurt can often replace it 1:1 in cakes and quick breads.\nBaking powder: 1 teaspoon can be replaced with 1/4 teaspoon baking soda plus 1/2 teaspoon cream of tartar.\nSwaps can change texture, so follow the recipe when possible.',
+'Measurements': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1 stick butter = 1/2 cup = 8 tablespoons = 113 g.\n1 cup all-purpose flour ≈ 120 g.\n1 cup granulated sugar ≈ 200 g.\nFor flour, spoon it into the cup and level the top. A kitchen scale is more accurate.',
+'Baking Tips': 'BETTER BAKES\n• Spoon flour into the measuring cup; do not pack it down.\n• Measure liquids at eye level.\n• Mix muffins and quick breads only until combined.\n• Use the center oven rack unless the recipe says otherwise.\n• Check doneness near the earliest suggested bake time.',
+'Flavor Combos': 'FLAVOR IDEAS\n🍋 Lemon + blueberry\n🍎 Apple + cinnamon\n🍫 Chocolate + raspberry\n🍌 Banana + walnut\n🎃 Pumpkin + ginger\n🌼 Vanilla + almond\nStart with small amounts of strong extracts and spices.',
+'What Happens If': 'BAKING TROUBLESHOOTER\nToo much flour: dry, dense results.\nOvermixed muffins or cake: tougher texture.\nOld baking powder: poor rise.\nOven too hot: browned outside, underbaked center.\nIngredient swaps: may change moisture, rise, and texture. Baking soda and baking powder are not interchangeable 1:1.',
+'Baking Challenges': 'YOUR MINI CHALLENGE\nChoose one recipe. Measure carefully, make one small change such as adding cinnamon or lemon zest, and note how the flavor and texture change.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+const item = e.target.closest('li');
+if (!item || !document.getElementById('roomTitle').textContent.includes('Baking Corner')) return;
+
+const text = item.textContent;
+let key = '';
+if (text.includes('Baking Basics')) key = 'Baking Basics';
+else if (text.includes('Ingredient Swaps')) key = 'Ingredient Swaps';
+else if (text.includes('Measurements')) key = 'Measurements';
+else if (text.includes('Baking Tips')) key = 'Baking Tips';
+else if (text.includes('Flavor Combos')) key = 'Flavor Combos';
+else if (text.includes('What Happens If')) key = 'What Happens If';
+else if (text.includes('Baking Challenges')) key = 'Baking Challenges';
+if (!key) return;
+
+let box = document.getElementById('bakingTip');
+if (!box) {
+box = document.createElement('p');
+box.id = 'bakingTip';
+box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+document.getElementById('roomList').after(box);
+}
+box.textContent = bakingTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+button.addEventListener('click', function() {
+const box = document.getElementById('bakingTip');
+if (box) box.remove();
+});
+});
 </script>
 </body></html>
