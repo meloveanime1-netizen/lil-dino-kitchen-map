@@ -185,7 +185,7 @@ document.getElementById('roomList').addEventListener('click', function(e) {
   if (!item || !document.getElementById('roomTitle').textContent.includes('Dinner Station')) return;
 
   const text = item.textContent;
-  const key = Object.keys(dinnerIdeas).find(k => text.includes(k));
+  const key = Object.keys(dinnerIdeas).find(k => text.includes(k) || text.includes(k.split(' ')[0]));
   if (!key) return;
 
   let box = document.getElementById('dinnerTip');
