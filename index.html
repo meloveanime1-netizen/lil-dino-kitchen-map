@@ -169,5 +169,40 @@ if (button.dataset.room === 'fridge') {
     }
   });
 });
+const dinnerIdeas = {
+  'Quick & Easy': '⚡ QUICK & EASY\n\nTry a 15-minute garlic butter pasta, scrambled egg fried rice, or a quick chicken wrap.',
+  'Cozy & Comforting': '🍲 COZY & COMFORTING\n\nTry creamy tomato soup with grilled cheese, chicken noodle soup, or a baked potato with your favorite toppings.',
+  'Fresh & Light': '🥗 FRESH & LIGHT\n\nTry a crunchy garden salad with chicken, veggie rice bowls, or lemon herb fish with vegetables.',
+  'Something Flavorful': '🌶️ SOMETHING FLAVORFUL\n\nTry spicy garlic noodles, fajita bowls, or honey-garlic chicken with rice.',
+  'Pasta Night': '🍝 PASTA NIGHT\n\nTry creamy garlic pasta, spaghetti with meat sauce, or pesto pasta with tomatoes.',
+  'Taco/Mexican Night': '🌮 TACO NIGHT\n\nTry chicken tacos, cheesy quesadillas, or burrito bowls with rice and beans.',
+  'One-Pan Dinner': '🍳 ONE-PAN DINNER\n\nTry sheet-pan chicken with vegetables, sausage and potatoes, or roasted chickpeas with peppers.',
+  'Surprise Me!': '🎲 LIL DINO’S SURPRISE\n\nTonight’s idea: crispy chicken wraps with lettuce and a simple side salad!'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Dinner Station')) return;
+
+  const text = item.textContent;
+  const key = Object.keys(dinnerIdeas).find(k => text.includes(k));
+  if (!key) return;
+
+  let box = document.getElementById('dinnerTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'dinnerTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5;';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = dinnerIdeas[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(b) {
+  b.addEventListener('click', function() {
+    const box = document.getElementById('dinnerTip');
+    if (box) box.remove();
+  });
+});
 </script>
 </body></html>
