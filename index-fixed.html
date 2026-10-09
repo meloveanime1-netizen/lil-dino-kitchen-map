@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explore Lil Dino's Kitchen</title>
+<style>
+:root{--cream:#fff8e8;--green:#315c36;--pink:#f28ba8;--brown:#8a5a3b}
+*{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--green);font-family:system-ui,-apple-system,Segoe UI,sans-serif;text-align:center}
+.wrap{max-width:1200px;margin:auto;padding:18px 12px 34px}.title{font-weight:800;font-size:clamp(25px,4vw,44px);color:var(--pink);margin:4px 0 2px}.sub{margin:0 0 16px;font-size:clamp(15px,2vw,20px);color:var(--green)}
+.map{position:relative;width:100%;overflow:hidden;border-radius:22px;box-shadow:0 8px 28px rgba(70,45,20,.18);background:#fff}.map img{display:block;width:100%;height:auto}
+.hotspot{position:absolute;background:transparent;border:0;padding:0;cursor:pointer;z-index:2}
+.hotspot:focus-visible{outline:3px solid #fff;border-radius:18px;box-shadow:0 0 0 5px var(--pink)}
+.panel{display:none;margin:18px auto 0;max-width:900px;background:#fff0f4;border:3px solid #f7b0c3;border-radius:20px;padding:18px;text-align:left;box-shadow:0 5px 18px rgba(70,45,20,.1)}
+.panel.show{display:block}.panel h2{margin:0 0 8px;color:#a94c6a;font-size:clamp(22px,3vw,30px)}.panel p{margin:0 0 10px;line-height:1.5}.panel ul{margin:8px 0 0 20px;padding:0;line-height:1.55}.close{float:right;border:0;background:var(--pink);color:white;font-weight:800;border-radius:999px;padding:7px 12px;cursor:pointer}
+.note{margin-top:12px;font-size:13px;opacity:.75}
+/* Invisible tap areas line up with the destination signs in the artwork. */
+.pantry{left:13%;top:22%;width:20%;height:12%}.fridge{left:1%;top:45%;width:18%;height:13%}.herb{left:34%;top:22%;width:23%;height:16%}.dinner{left:53%;top:25%;width:23%;height:13%}.baking{right:10%;top:25%;width:20%;height:13%}.cafe{right:0%;top:43%;width:18%;height:16%}.prep{left:39%;top:53%;width:21%;height:15%}.secret{right:1%;top:62%;width:20%;height:15%}.trash{right:0%;bottom:1%;width:21%;height:15%}.hq{left:4%;bottom:1%;width:25%;height:25%}
+@media (max-width:600px){.wrap{padding:10px 7px 24px}.map{border-radius:14px}.panel{padding:14px;border-radius:15px}.note{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">🗺️ Explore Lil Dino's Kitchen</h1>
+  <p class="sub">Where should we explore today?<br>Pick a destination and start your adventure! ✨</p>
+  <div class="map" aria-label="Interactive map of Lil Dino's kitchen">
+    <img src="kitchen-map.png" alt="Little Dino's Kitchen Adventures map with Lil Dino on a pink step stool and his hamster-dragon pet beside him">
+    <button class="hotspot pantry" aria-label="Open Pantry" data-room="pantry"></button>
+    <button class="hotspot fridge" aria-label="Open Fridge" data-room="fridge"></button>
+    <button class="hotspot herb" aria-label="Open Herb Garden" data-room="herb"></button>
+    <button class="hotspot dinner" aria-label="Open Dinner Station" data-room="dinner"></button>
+    <button class="hotspot baking" aria-label="Open Baking Corner" data-room="baking"></button>
+    <button class="hotspot cafe" aria-label="Open Cozy Cafe" data-room="cafe"></button>
+    <button class="hotspot prep" aria-label="Open Prep Counter" data-room="prep"></button>
+    <button class="hotspot secret" aria-label="Open Secret Recipe Room" data-room="secret"></button>
+    <button class="hotspot trash" aria-label="Open Kitchen Trash" data-room="trash"></button>
+    <button class="hotspot hq" aria-label="Open Lil Dino's Kitchen HQ" data-room="hq"></button>
+  </div>
+  <section class="panel" id="panel" aria-live="polite">
+    <button class="close" id="close">Close</button>
+    <h2 id="roomTitle"></h2><p id="roomDesc"></p><ul id="roomList"></ul>
+  </section>
+  <div class="note">Tap a sign in the kitchen to explore. 🦖💗</div>
+</div>
+<script>
+const rooms={
+ pantry:{title:'🍓 The Pantry — Pantry Master',desc:'Welcome to the Pantry! Learn how to organize, store, and use everyday kitchen staples.',items:['🫙 Store It — simple storage tips','🧺 Organize It — make pantry items easy to find','🌾 Learn About It — pantry staple basics','⏰ Use It First — ideas for items that should be used soon']},
+fridge:{title:'🥛 The Fridge — Food Freshness Guide',desc:'Keep your food fresh and your kitchen adventures safe.',items:['🥬 Produce — simple freshness and storage tips','🥩 Meat & Dairy — safer storage reminders','🥚 Eggs — where and how to store them','❄️ Freeze It — when freezing can help','👀 Use Me First! — foods to check first']},
+ herb:{title:'🌿 The Herb Garden — Herb & Seasoning Guide',desc:'Pick a food and discover herbs and seasonings that pair beautifully with it.',items:['🍗 Chicken','🍝 Pasta','🥦 Vegetables','🍲 Soup','🥔 Potatoes','🥚 Eggs']},
+ dinner:{title:'🍝 The Dinner Station — Dinner Generator',desc:'Tell Lil Dino what kind of dinner mood you are in and get an idea to try.',items:['⚡ Quick & Easy','🍲 Cozy & Comforting','🥗 Fresh & Light','🌶️ Something Flavorful','🍝 Pasta Night','🌮 Taco/Mexican Night','🥘 One-Pan Dinner','🎲 Surprise Me!']},
+ baking:{title:'🍪 The Baking Corner — Baking Lab',desc:'A little baking lab for swaps, troubleshooting, flavor ideas, and challenges.',items:['🧁 Baking basics','🔄 Ingredient swaps','🛠️ Troubleshooting','🍓 Flavor combos','🎯 Baking challenges','❓ What Happens If…?']},
+ cafe:{title:'☕ The Cozy Café — Café Corner',desc:'Step into Lil Dino’s tiny café for a drink or snack idea with a fun café twist.',items:['☀️ Fresh & Fruity','🍫 Sweet & Cozy','☕ Coffeehouse','🧊 Cool & Refreshing','🥐 Breakfast Café','🎲 Surprise Me!']},
+ prep:{title:'🧊 The Prep Counter — Kitchen Skills Lab',desc:'Practice the little kitchen skills that make cooking easier and more fun.',items:['🔪 Chop & Cut','🥄 Measure It','🥣 Mix & Prep','🔥 Cooking Basics','🧼 Kitchen Safety','🎯 Skill Challenge']},
+ secret:{title:'✨ The Secret Recipe Room — Mystery Quest',desc:'Shhh... Lil Dino has been hiding something delicious.',items:['🎲 Mystery Recipe','🔐 Hidden Recipes','🌎 Secret Around-the-World Recipe','🎃 Seasonal Secrets','🧩 Recipe Challenge','🎁 Mystery Box']},
+ trash:{title:'🗑️ The Kitchen Trash Can — Before You Toss It!',desc:'Before you throw scraps away, see whether they can be used, eaten, or composted.',items:['🍊 Citrus peels','🥔 Potato peels','🥚 Eggshells','🥦 Broccoli stems','🌿 Herb stems','🍎 Apple peels','🍌 Banana peels','⚠️ Safety first — when in doubt, throw it out']},
+ hq:{title:'🦖 Lil Dino’s Kitchen HQ',desc:'This is home base for Little Dino’s Kitchen Adventures!',items:['💗 Cook','🗺️ Explore','✨ Discover','🐹 Meet Lil Dino’s tiny hamster-dragon adventure buddy!']}
+};
+const panel=document.getElementById('panel'),title=document.getElementById('roomTitle'),desc=document.getElementById('roomDesc'),list=document.getElementById('roomList');
+document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{const r=rooms[b.dataset.room];title.textContent=r.title;desc.textContent=r.desc;list.innerHTML=r.items.map(x=>`<li>${x}</li>`).join('');panel.classList.add('show');panel.scrollIntoView({behavior:'smooth',block:'nearest'});}));
+document.getElementById('close').onclick=()=>panel.classList.remove('show');
+document.querySelectorAll('.hotspot').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.room==='fridge'){list.innerHTML="<li>🍓 Strawberries — Keep refrigerated and dry. Use soft or moldy berries first.</li><li>🐉 Dragon Fruit — Refrigerate ripe fruit for longer freshness.</li><li>🍌 Bananas — Store at room temperature; refrigerate ripe bananas to slow ripening.</li><li>🍎 Apples — Keep refrigerated for longer freshness.</li><li>🥬 Lettuce — Refrigerate in a container or bag with a little airflow.</li><li>🫐 Berries — Refrigerate unwashed and wash just before eating.</li><li>🥛 Milk — Keep cold in the main refrigerator area, not the door.</li><li>🥚 Eggs — Keep refrigerated in their carton.</li><li>🥩 Meat & Chicken — Keep cold and use or freeze promptly.</li><li>🍞 Bread — Store sealed at room temperature; freeze extra bread for longer storage.</li>"}}));</script>
+<script>
+const herbTips = {
+'🍗 Chicken':'🌿 Rosemary, thyme, garlic, and paprika. Great for roasted or grilled chicken.',
+'🍝 Pasta':'🌿 Basil, oregano, and parsley. Basil is especially good in tomato sauces.',
+'🥦 Vegetables':'🌿 Thyme, dill, parsley, and garlic. Try thyme with roasted vegetables.',
+'🍲 Soup':'🌿 Bay leaf, thyme, and parsley. Remove the bay leaf before serving.',
+'🥔 Potatoes':'🌿 Rosemary, garlic, and paprika. Delicious with roasted potatoes.',
+'🥚 Eggs':'🌿 Chives, dill, parsley, and black pepper. Add fresh herbs near the end.'
+};
+document.getElementById('roomList').addEventListener('click', function(e) {
+ const item = e.target.closest('li');
+ if (!item || !document.getElementById('roomTitle').textContent.includes('Herb Garden')) return;
+ const tip = herbTips[Object.keys(herbTips).find(k => item.textContent.includes(k.slice(2)))];
+ if (!tip) return;
+ let box = document.getElementById('herbTip');
+ if (!box) {
+  box = document.createElement('p');
+  box.id = 'herbTip';
+  box.style.cssText = 'background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+  document.getElementById('roomList').after(box);
+ }
+ box.textContent = tip;
+});
+document.querySelectorAll('.hotspot').forEach(function(b) {
+ b.addEventListener('click', function() {
+  const box = document.getElementById('herbTip');
+  if (box) box.remove();
+ });
+});
+const pantryTips = {
+'Store It': '🫙 STORAGE GUIDE\n\nFlour: Keep sealed in a cool, dry place. Whole-wheat flour lasts longer in the fridge or freezer.\n\nRice: Store airtight in a cool, dry cupboard.\n\nPasta: Keep sealed and dry, away from heat.\n\nBrown sugar: Store airtight to help prevent hardening.\n\nCooking oil: Keep tightly closed away from heat and sunlight.',
+'Organize It': '🧺 ORGANIZE YOUR PANTRY\n\nGroup baking supplies together, keep grains and pasta in one area, and place frequently used ingredients where they are easy to reach. Label containers and keep original package dates.',
+'Learn About It': '🌾 PANTRY STAPLES\n\nFlour helps baked goods hold their structure. Rice and pasta provide carbohydrates. Beans offer plant protein and fiber. Oils add fat and help cook food. Check package labels for ingredients and storage directions.',
+'Use It First': '⏰ USE IT FIRST\n\nCheck dates and packages regularly. Use older items first when they are still safe and in good condition. Discard food with insects, moisture, mold, damaged packaging, or an unusual smell.'
+};
+document.getElementById('roomList').addEventListener('click', function(e) {
+ const item = e.target.closest('li');
+ if (!item || !document.getElementById('roomTitle').textContent.includes('Pantry')) return;
+ const text = item.textContent;
+ let key = '';
+ if (text.includes('Store It')) key = 'Store It';
+ else if (text.includes('Organize It')) key = 'Organize It';
+ else if (text.includes('Learn About It')) key = 'Learn About It';
+ else if (text.includes('Use It First')) key = 'Use It First';
+ if (!key) return;
+ let box = document.getElementById('pantryTip');
+ if (!box) {
+  box = document.createElement('p');
+  box.id = 'pantryTip';
+  box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+  document.getElementById('roomList').after(box);
+ }
+ box.textContent = pantryTips[key];
+});
+document.querySelectorAll('.hotspot').forEach(function(b) {
+ b.addEventListener('click', function() {
+  const box = document.getElementById('pantryTip');
+  if (box) box.remove();
+ });
+});
+const fridgeTips = {
+'Produce': '🍓 PRODUCE FRESHNESS\n\nStrawberries: Refrigerate dry and unwashed; remove moldy berries.\n\nDragon fruit: Refrigerate ripe fruit in a container or bag.\n\nLettuce: Refrigerate in a bag or container; keep it dry.\n\nBerries: Refrigerate unwashed and wash before eating.',
+'Meat & Dairy': '🥩 MEAT & DAIRY SAFETY\n\nChicken and raw meat: Store sealed on the lowest shelf. Use within 1–2 days or freeze.\n\nMilk: Keep in the main refrigerator area, not the door.\n\nKeep your fridge at 40°F (4°C) or colder.',
+'Eggs': '🥚 EGG STORAGE\n\nKeep eggs in their original carton inside the refrigerator, not in the door.\n\nRefrigerate cooked eggs promptly and use within one week.',
+'Freeze It': '❄️ FREEZER TIPS\n\nFreeze extra berries, chopped fruit, bread, cooked rice, and leftovers in airtight containers.\n\nLabel items with the date and remove excess air from freezer bags.',
+'Use Me First': '⏰ USE THESE FIRST\n\nCheck ripe berries, cut fruit, leafy greens, and opened foods regularly.\n\nUse older safe items before newer ones. Throw away food with mold or suspicious spoilage.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Fridge')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Produce')) key = 'Produce';
+  else if (text.includes('Meat & Dairy')) key = 'Meat & Dairy';
+  else if (text.includes('Eggs')) key = 'Eggs';
+  else if (text.includes('Freeze It')) key = 'Freeze It';
+  else if (text.includes('Use Me First')) key = 'Use Me First';
+  if (!key) return;
+
+  let box = document.getElementById('fridgeTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'fridgeTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = fridgeTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(b) {
+  b.addEventListener('click', function() {
+    const box = document.getElementById('fridgeTip');
+    if (box) box.remove();
+  });
+});
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+if (button.dataset.room === 'fridge') {
+  document.getElementById('roomTitle').textContent = '🥬 The Fridge — Food Freshness Guide';
+      document.getElementById('roomList').innerHTML =
+        '<li>🥬 Produce</li>' +
+        '<li>🥩 Meat & Dairy</li>' +
+        '<li>🥚 Eggs</li>' +
+        '<li>❄️ Freeze It</li>' +
+        '<li>👀 Use Me First</li>';
+    }
+  });
+});
+const dinnerIdeas = {
+  'Quick & Easy': '⚡ QUICK & EASY\n\nTry a 15-minute garlic butter pasta, scrambled egg fried rice, or a quick chicken wrap.',
+  'Cozy & Comforting': '🍲 COZY & COMFORTING\n\nTry creamy tomato soup with grilled cheese, chicken noodle soup, or a baked potato with your favorite toppings.',
+  'Fresh & Light': '🥗 FRESH & LIGHT\n\nTry a crunchy garden salad with chicken, veggie rice bowls, or lemon herb fish with vegetables.',
+  'Something Flavorful': '🌶️ SOMETHING FLAVORFUL\n\nTry spicy garlic noodles, fajita bowls, or honey-garlic chicken with rice.',
+  'Pasta Night': '🍝 PASTA NIGHT\n\nTry creamy garlic pasta, spaghetti with meat sauce, or pesto pasta with tomatoes.',
+  'Taco/Mexican Night': '🌮 TACO NIGHT\n\nTry chicken tacos, cheesy quesadillas, or burrito bowls with rice and beans.',
+  'One-Pan Dinner': '🍳 ONE-PAN DINNER\n\nTry sheet-pan chicken with vegetables, sausage and potatoes, or roasted chickpeas with peppers.',
+  'Surprise Me!': '🎲 LIL DINO’S SURPRISE\n\nTonight’s idea: crispy chicken wraps with lettuce and a simple side salad!'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Dinner Station')) return;
+
+  const text = item.textContent;
+  const key = Object.keys(dinnerIdeas).find(k => text.includes(k) || text.includes(k.split(' ')[0]));
+  if (!key) return;
+
+  let box = document.getElementById('dinnerTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'dinnerTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5;';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = dinnerIdeas[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(b) {
+  b.addEventListener('click', function() {
+    const box = document.getElementById('dinnerTip');
+    if (box) box.remove();
+  });
+});
+document.querySelectorAll('.hotspot').forEach(function(button) {
+button.addEventListener('click', function() {
+if (button.dataset.room === 'baking') {
+document.getElementById('roomTitle').textContent = '🍪 The Baking Corner — Baking Lab';
+document.getElementById('roomDesc').textContent = 'Choose a guide for smarter, tastier bakes.';
+document.getElementById('roomList').innerHTML =
+'<li>🧁 Baking Basics</li>' +
+'<li>🔄 Ingredient Swaps</li>' +
+'<li>🥄 Measurements</li>' +
+'<li>🔥 Baking Tips</li>' +
+'<li>🍓 Flavor Combos</li>' +
+'<li>❓ What Happens If…?</li>' +
+'<li>🎯 Baking Challenges</li>';
+}
+const old = document.getElementById('bakingTip');
+if (old) old.remove();
+});
+});
+
+const bakingTips = {
+'Baking Basics': 'PREP FIRST\nPreheat the oven. Gather and measure ingredients before mixing. Use room-temperature ingredients when the recipe calls for them. Cool baked goods on a rack.',
+'Ingredient Swaps': 'USEFUL SWAPS\nButtermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Wait 5–10 minutes.\nSour cream: plain yogurt can often replace it 1:1 in cakes and quick breads.\nBaking powder: 1 teaspoon can be replaced with 1/4 teaspoon baking soda plus 1/2 teaspoon cream of tartar.\nSwaps can change texture, so follow the recipe when possible.',
+'Measurements': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1 stick butter = 1/2 cup = 8 tablespoons = 113 g.\n1 cup all-purpose flour ≈ 120 g.\n1 cup granulated sugar ≈ 200 g.\nFor flour, spoon it into the cup and level the top. A kitchen scale is more accurate.',
+'Baking Tips': 'BETTER BAKES\n• Spoon flour into the measuring cup; do not pack it down.\n• Measure liquids at eye level.\n• Mix muffins and quick breads only until combined.\n• Use the center oven rack unless the recipe says otherwise.\n• Check doneness near the earliest suggested bake time.',
+'Flavor Combos': 'FLAVOR IDEAS\n🍋 Lemon + blueberry\n🍎 Apple + cinnamon\n🍫 Chocolate + raspberry\n🍌 Banana + walnut\n🎃 Pumpkin + ginger\n🌼 Vanilla + almond\nStart with small amounts of strong extracts and spices.',
+'What Happens If': 'BAKING TROUBLESHOOTER\nToo much flour: dry, dense results.\nOvermixed muffins or cake: tougher texture.\nOld baking powder: poor rise.\nOven too hot: browned outside, underbaked center.\nIngredient swaps: may change moisture, rise, and texture. Baking soda and baking powder are not interchangeable 1:1.',
+'Baking Challenges': 'YOUR MINI CHALLENGE\nChoose one recipe. Measure carefully, make one small change such as adding cinnamon or lemon zest, and note how the flavor and texture change.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+const item = e.target.closest('li');
+if (!item || !document.getElementById('roomTitle').textContent.includes('Baking Corner')) return;
+
+const text = item.textContent;
+let key = '';
+if (text.includes('Baking Basics')) key = 'Baking Basics';
+else if (text.includes('Ingredient Swaps')) key = 'Ingredient Swaps';
+else if (text.includes('Measurements')) key = 'Measurements';
+else if (text.includes('Baking Tips')) key = 'Baking Tips';
+else if (text.includes('Flavor Combos')) key = 'Flavor Combos';
+else if (text.includes('What Happens If')) key = 'What Happens If';
+else if (text.includes('Baking Challenges')) key = 'Baking Challenges';
+if (!key) return;
+
+let box = document.getElementById('bakingTip');
+if (!box) {
+box = document.createElement('p');
+box.id = 'bakingTip';
+box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+document.getElementById('roomList').after(box);
+}
+box.textContent = bakingTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+button.addEventListener('click', function() {
+const box = document.getElementById('bakingTip');
+if (box) box.remove();
+});
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'cafe') {
+      document.getElementById('roomTitle').textContent = '☕ Cozy Café — Drinks & Treats';
+      document.getElementById('roomDesc').textContent = 'Simple café favorites to make at home.';
+      document.getElementById('roomList').innerHTML =
+        '<li>☕ Coffee & Tea</li>' +
+        '<li>🍓 Refreshing Drinks</li>' +
+        '<li>🍰 Café Treats</li>' +
+        '<li>🍯 Syrups & Flavor Ideas</li>' +
+        '<li>🧊 Ice & Serving Tips</li>';
+    }
+    const old = document.getElementById('cafeTip');
+    if (old) old.remove();
+  });
+});
+
+const cafeTips = {
+  'Coffee & Tea': 'COFFEE & TEA\nFollow the package directions. For brewed coffee, start with about 1–2 tablespoons of ground coffee per 6 ounces of water, then adjust to taste. Green tea usually tastes better with cooler water than boiling water.',
+  'Refreshing Drinks': 'REFRESHING DRINKS\nStrawberry refresher: mash 3–4 sliced strawberries with 1 teaspoon sugar. Add 1 cup cold water or chilled tea, a squeeze of lemon, and ice. Stir and taste before adding more sugar.',
+  'Café Treats': 'EASY CAFÉ TREATS\nYogurt parfait: layer yogurt, fruit, and granola. Cinnamon toast: spread butter on toast and sprinkle with cinnamon sugar. For a treat, add sliced bananas or berries.',
+  'Syrups & Flavor Ideas': 'FLAVOR IDEAS\nVanilla + cinnamon, strawberry + lemon, caramel + coffee, honey + ginger tea, or chocolate + peppermint. Start with a small amount of syrup and add more to taste.',
+  'Ice & Serving Tips': 'ICE & SERVING TIPS\nChill drinks before serving. Large ice cubes melt more slowly. Freeze leftover coffee in an ice-cube tray for iced coffee. Keep milk-based drinks refrigerated and do not leave them out for more than 2 hours.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Cozy Café')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Coffee & Tea')) key = 'Coffee & Tea';
+  else if (text.includes('Refreshing Drinks')) key = 'Refreshing Drinks';
+  else if (text.includes('Café Treats')) key = 'Café Treats';
+  else if (text.includes('Syrups & Flavor Ideas')) key = 'Syrups & Flavor Ideas';
+  else if (text.includes('Ice & Serving Tips')) key = 'Ice & Serving Tips';
+  if (!key) return;
+
+  let box = document.getElementById('cafeTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'cafeTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = cafeTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    const box = document.getElementById('cafeTip');
+    if (box) box.remove();
+  });
+});
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'cafe') {
+      document.getElementById('roomTitle').textContent = '☕ Cozy Café — Drinks & Treats';
+      document.getElementById('roomDesc').textContent = 'Simple café favorites to make at home.';
+      document.getElementById('roomList').innerHTML =
+        '<li>☕ Coffee & Tea</li>' +
+        '<li>🍓 Refreshing Drinks</li>' +
+        '<li>🍰 Café Treats</li>' +
+        '<li>🍯 Syrups & Flavor Ideas</li>' +
+        '<li>🧊 Ice & Serving Tips</li>';
+    }
+  });
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'prep') {
+      document.getElementById('roomTitle').textContent = '🔪 Prep Counter — Kitchen Skills Lab';
+      document.getElementById('roomDesc').textContent = 'Practical skills to help you prep ingredients safely and confidently.';
+      document.getElementById('roomList').innerHTML =
+        '<li>🔪 Cutting Skills</li>' +
+        '<li>🐔 Preparing Meat Safely</li>' +
+        '<li>🥄 Measurements & Conversions</li>' +
+        '<li>🔄 Ingredient Substitutions</li>' +
+        '<li>🧅 Ingredient Prep Tips</li>';
+    }
+    const old = document.getElementById('prepTip');
+    if (old) old.remove();
+  });
+});
+
+const prepTips = {
+  'Cutting Skills': 'KNIFE BASICS\nUse a stable cutting board. Trim the ends of an onion, cut it in half through the root, peel it, and slice safely with curled fingertips. For shallots, peel and slice lengthwise.',
+  'Preparing Meat Safely': 'MEAT SAFETY\nUse a separate board for raw chicken. Keep it away from ready-to-eat foods, and do not wash raw chicken. Cook chicken to 165°F (74°C), checking the thickest part with a food thermometer.',
+  'Measurements & Conversions': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1/2 cup = 8 tablespoons.\n1 cup of all-purpose flour weighs about 120 g; weight varies by ingredient.',
+  'Ingredient Substitutions': 'QUICK SWAPS\n1 cup buttermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Wait 5–10 minutes.\nPlain yogurt can often replace sour cream in baked goods. Swaps may change texture.',
+  'Ingredient Prep Tips': 'PREP SMARTER\nRead the recipe first. Wash produce under running water and dry it before cutting. Measure ingredients before you begin, and keep raw meat and its utensils separate from other foods.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Prep Counter')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Cutting Skills')) key = 'Cutting Skills';
+  else if (text.includes('Preparing Meat Safely')) key = 'Preparing Meat Safely';
+  else if (text.includes('Measurements')) key = 'Measurements & Conversions';
+  else if (text.includes('Ingredient Substitutions')) key = 'Ingredient Substitutions';
+  else if (text.includes('Ingredient Prep Tips')) key = 'Ingredient Prep Tips';
+  if (!key) return;
+
+  let box = document.getElementById('prepTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'prepTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = prepTips[key];
+});
+  
+document.getElementById('prepMore')?.remove();
+
+const prepMore = {
+  'Cutting Skills': 'KNIFE BASICS\nUse a stable cutting board. Trim the ends off an onion, cut it in half through the root, peel it, then slice toward the root without cutting through it. For shallots, halve lengthwise and slice thinly. Keep fingertips curled back and use a sharp knife carefully.',
+  'Preparing Meat Safely': 'MEAT SAFETY\nUse a separate board for raw chicken. Keep it away from ready-to-eat foods. Do not wash raw chicken because splashes can spread germs. Cook chicken to 165°F (74°C) in the thickest part, using a food thermometer. Wash hands and clean surfaces after handling raw meat.',
+  'Measurements & Conversions': 'US MEASUREMENTS\n1 cup = 16 tablespoons = 48 teaspoons.\n1 tablespoon = 3 teaspoons.\n1 stick butter = 1/2 cup = 8 tablespoons = 113 g.\n1 cup all-purpose flour ≈ 120 g; 1 cup granulated sugar ≈ 200 g. Flour weights vary, so use the recipe’s weight when provided.',
+  'Ingredient Substitutions': 'QUICK SWAPS\nButtermilk: add 1 tablespoon lemon juice or vinegar to a measuring cup, then add milk to the 1-cup line. Rest 5–10 minutes.\nSour cream: plain yogurt often works in cakes and quick breads.\nSubstitutions can change flavor and texture, so use a tested recipe when possible.',
+  'Ingredient Prep Tips': 'PREP SMARTER\nRead the recipe first. Wash produce under running water and dry it before cutting. Measure ingredients before mixing. Keep raw meat and its utensils separate from produce. Follow the recipe’s ingredient sizes and prep instructions.'
+};
+  
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'baking') {
+      document.getElementById('roomTitle').textContent = '🍪 The Baking Corner — Baking Lab';
+      document.getElementById('roomDesc').textContent = 'Practical baking help, measurements, swaps, and flavor ideas.';
+      document.getElementById('roomList').innerHTML =
+        '<li>🧁 Baking Basics</li>' +
+        '<li>🔄 Ingredient Swaps</li>' +
+        '<li>🥄 Measurements</li>' +
+        '<li>🔥 Baking Tips</li>' +
+        '<li>🍓 Flavor Combos</li>' +
+        '<li>❓ What Happens If…?</li>' +
+        '<li>🎯 Baking Challenges</li>';
+    }
+const old = document.getElementById('bakingTip');
+    if (old) old.remove();
+  });
+});
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Baking Corner')) return;
+  const key = Object.keys(bakingTips).find(k => item.textContent.includes(k.slice(2)));
+  if (!key) return;
+  let box = document.getElementById('bakingTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'bakingTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = bakingTips[key];
+});
+</script>
+</body></html>
