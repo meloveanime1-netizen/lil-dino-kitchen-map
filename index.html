@@ -264,5 +264,60 @@ const box = document.getElementById('bakingTip');
 if (box) box.remove();
 });
 });
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    if (button.dataset.room === 'cafe') {
+      document.getElementById('roomTitle').textContent = '☕ Cozy Café — Drinks & Treats';
+      document.getElementById('roomDesc').textContent = 'Simple café favorites to make at home.';
+      document.getElementById('roomList').innerHTML =
+        '<li>☕ Coffee & Tea</li>' +
+        '<li>🍓 Refreshing Drinks</li>' +
+        '<li>🍰 Café Treats</li>' +
+        '<li>🍯 Syrups & Flavor Ideas</li>' +
+        '<li>🧊 Ice & Serving Tips</li>';
+    }
+    const old = document.getElementById('cafeTip');
+    if (old) old.remove();
+  });
+});
+
+const cafeTips = {
+  'Coffee & Tea': 'COFFEE & TEA\nFollow the package directions. For brewed coffee, start with about 1–2 tablespoons of ground coffee per 6 ounces of water, then adjust to taste. Green tea usually tastes better with cooler water than boiling water.',
+  'Refreshing Drinks': 'REFRESHING DRINKS\nStrawberry refresher: mash 3–4 sliced strawberries with 1 teaspoon sugar. Add 1 cup cold water or chilled tea, a squeeze of lemon, and ice. Stir and taste before adding more sugar.',
+  'Café Treats': 'EASY CAFÉ TREATS\nYogurt parfait: layer yogurt, fruit, and granola. Cinnamon toast: spread butter on toast and sprinkle with cinnamon sugar. For a treat, add sliced bananas or berries.',
+  'Syrups & Flavor Ideas': 'FLAVOR IDEAS\nVanilla + cinnamon, strawberry + lemon, caramel + coffee, honey + ginger tea, or chocolate + peppermint. Start with a small amount of syrup and add more to taste.',
+  'Ice & Serving Tips': 'ICE & SERVING TIPS\nChill drinks before serving. Large ice cubes melt more slowly. Freeze leftover coffee in an ice-cube tray for iced coffee. Keep milk-based drinks refrigerated and do not leave them out for more than 2 hours.'
+};
+
+document.getElementById('roomList').addEventListener('click', function(e) {
+  const item = e.target.closest('li');
+  if (!item || !document.getElementById('roomTitle').textContent.includes('Cozy Café')) return;
+
+  const text = item.textContent;
+  let key = '';
+  if (text.includes('Coffee & Tea')) key = 'Coffee & Tea';
+  else if (text.includes('Refreshing Drinks')) key = 'Refreshing Drinks';
+  else if (text.includes('Café Treats')) key = 'Café Treats';
+  else if (text.includes('Syrups & Flavor Ideas')) key = 'Syrups & Flavor Ideas';
+  else if (text.includes('Ice & Serving Tips')) key = 'Ice & Serving Tips';
+  if (!key) return;
+
+  let box = document.getElementById('cafeTip');
+  if (!box) {
+    box = document.createElement('p');
+    box.id = 'cafeTip';
+    box.style.cssText = 'white-space:pre-line;background:#fff8e8;padding:12px;border-radius:12px;margin-top:12px;line-height:1.5';
+    document.getElementById('roomList').after(box);
+  }
+  box.textContent = cafeTips[key];
+});
+
+document.querySelectorAll('.hotspot').forEach(function(button) {
+  button.addEventListener('click', function() {
+    const box = document.getElementById('cafeTip');
+    if (box) box.remove();
+  });
+});
 </script>
 </body></html>
